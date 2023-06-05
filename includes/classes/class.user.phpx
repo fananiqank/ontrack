@@ -1,0 +1,236 @@
+<?php
+
+class User extends App {
+
+    public static function add($data) {
+        
+        global $database;
+        $email = strtolower($data['email']);
+        $count = $database->count("people",["email" => $email]);
+        if ($count == "1") { return "11"; }
+
+        $expclient = explode('_', $data['clientid']);
+
+        $password = sha1($data['password']);
+        $lastid = $database->insert("people", [
+            "name" => $data['name'],
+            "nogm" => $data['nogm'],
+            "type" => "user",
+            "roleid" => $data['roleid'],
+            "clientid" => $expclient[1],
+            "email" => $email,
+            "ldap_user" => $data['ldap_user'],
+            "title" => $data['title'],
+            "mobile" => $data['mobile'],
+            "password" => $password,
+            "theme" => "skin-blue",
+            "sidebar" => "opened",
+            "layout" => "",
+            "notes" => "",
+            "signature" => "",
+            "sessionid" => "",
+            "resetkey" => "",
+            "autorefresh" => 0,
+            "lang" => getConfigValue("default_lang"),
+            "ticketsnotification" => 0,
+            "approval_type" => $data['approval_type'],
+            "statusid" => "Active",
+            "locationid" => $expclient[0],
+            ]);
+        if ($lastid == "0") { return "11"; } else {
+            if(isset($data['notification'])) { if($data['notification'] == true) Notification::newUser($lastid,$data['password']); }
+            logSystem("User Added - ID: " . $lastid);
+            return "10";
+        }
+    }
+
+    public static function edit($data) {
+        
+        // global $database;
+
+        // for($i=1;$i<=$data['jmlam'];$i++){
+        //     $coy = $_POST['akunakses'.$i]; 
+        //     if($coy){
+        //         $vb[].= $coy;
+        //     }
+        // }
+
+        // $jumminta = implode(";", $vb);
+        // echo $jumminta;
+        // die();
+
+        $expclient = explode('_', $data['clientid']);
+        $email = strtolower($data['email']);
+        if ($data['password'] == "") {
+            $database->update("people", [
+                "roleid" => $data['roleid'],
+                "clientid" => $expclient[1],
+                "name" => $data['name'],
+                "nogm" => $data['nogm'],
+                "ldap_user" => $data['ldap_user'],
+                "email" => $email,
+                "title" => $data['title'],
+                "mobile" => $data['mobile'],
+                "theme" => $data['theme'],
+                "sidebar" => $data['sidebar'],
+                "layout" => $data['layout'],
+                "notes" => $data['notes'],
+                "lang" => $data['lang'],
+                "modify_date" => date('Y-m-d H:i:s'),
+                "statusid" => $data['statusid'],
+                "approval_type" => $data['approval_type'],
+                "locationid" => $expclient[0],
+                // "websiteakses" => $data['websiteakses'],
+                // "akunakses" =>  $jumminta,
+
+                ],["id" => $data['id']]);
+            logSystem("User Edited - ID: " . $data['id']);
+            return "20";
+        }
+        else {
+            $password = sha1($data['password']);
+            $database->update("people", [
+                "roleid" => $data['roleid'],
+                "clientid" => $expclient[0],
+                "name" => $data['name'],
+                "nogm" => $data['nogm'],
+                "email" => $email,
+                "ldap_user" => $data['ldap_user'],
+                "title" => $data['title'],
+                "mobile" => $data['mobile'],
+                "password" => $password,
+                "theme" => $data['theme'],
+                "sidebar" => $data['sidebar'],
+                "layout" => $data['layout'],
+                "notes" => $data['notes'],
+                "lang" => $data['lang'],
+                "statusid" => $data['statusid'],
+                "modify_date" => date('Y-m-d H:i:s'),
+                "approval_type" => $data['approval_type'],
+                "locationid" => $expclient[1],
+                // "websiteakses" => $data['websiteakses'],
+                // "akunakses" =>  $jumminta,
+                ],["id" => $data['id']]);
+            logSystem("User Edited - ID: " . $data['id']);
+            return "20";
+        }
+    }
+
+    public static function delete($id) {
+        
+        global $database;
+        $database->delete("people", [ "id" => $id ]);
+        logSystem("User Deleted - ID: " . $id);
+        return "30";
+    }
+
+    public static function assigntsuser($data) {
+        
+        global $database;
+        global $liu;
+        $ascoks = $database->query("select b.id,b.machine_id,b.name as assetname,nodenumber,c.name as categoryname,a.id as peopleid,a.email from people a join people_dtl_request d on a.id=d.peopleid join assets b on a.id=b.userid join assetcategories c on b.categoryid=c.id where d.id = '$_POST[peopledtlid]' and b.categoryid in (1,2,7) and b.statusid > 0");
+        foreach($ascoks as $ascok){}
+
+        $selped = $database->query("select a.* from people_dtl_request a join people b on a.peopleid=b.id 
+                                     where a.id = '$_POST[peopledtlid]'");
+        foreach($selped as $saped){}
+    
+        $depts =  getTableFiltered("clients","id","$data[clientid]");
+        foreach($depts as $dept);
+
+        $tgl = date('Y-m-d');
+        $thn = date("y",strtotime($tgl));
+        $bln = date("m",strtotime($tgl));
+        $tg = date("d",strtotime($tgl));
+        $query = $database->query("select ticket AS maxID from tickets where SUBSTRING_INDEX(SUBSTRING_INDEX(ticket,'/',2),'/',-1)='$dateid' ORDER BY 
+    SUBSTRING_INDEX(ticket,'/',-2) desc limit 1");
+        foreach($query as $dta){}
+        
+        $idMaxj = $dta['maxID'];
+        $temp=explode("/",$idMaxj);
+        
+        $noUrutj = intval($temp[2]);
+        $noBlnj =  substr($temp[1], 0, 6); 
+        
+        
+        if($noBlnj<> $thn.$bln.$tg)
+        {
+            $noUrutj=1;
+        } else {
+            $noUrutj++;
+        }
+
+        if($dept['inisial_client'] != ''){
+            $depc = $dept['inisial_client'];
+        } else {
+            $depc = 'IT';
+        }
+        
+        foreach($database->query("select email,name from people where id = '$_POST[peopleid]'") as $emailadmin){}
+
+        $noticket= "IT"."/".$thn."".$bln."".$tg."/".sprintf("%03s", $noUrutj);
+        $data3 = array('ticket' =>  $noticket,
+        'departmentid' => 1,
+        'clientid' => 6,
+        'userid' => $ascok['peopleid'],
+        'adminid' => $_POST['peopleid'],
+        'projectid' => 0,
+        'email' => $ascok['email'],
+        'subject' => $_POST['tsnotes'],
+        'status' => 'Open',
+        'priority' => 'Normal',
+        'timestamp' => date('Y-m-d H:i:s'),
+        'timespent' => 0,
+        'reported' => $liu['name'],
+        'reported_ip' => gethostbyaddr($_SERVER['REMOTE_ADDR']),
+        'reported_email' => $liu['email'],
+        'typeasset' => 1,
+        'typeticket' => 2,
+        'assetid' => $ascok['id'],
+        'people_dtl_request_id' => $_POST['peopledtlid'],
+        'ticketidparent' => $_POST['ticketidparent']);
+          // var_dump($data3);
+          // die();
+        $ticketid = $database->insert("tickets", [
+            'ticket' =>  $noticket,
+            'departmentid' => 1,
+            'clientid' => 6,
+            'userid' => $ascok['peopleid'],
+            'adminid' => $_POST['peopleid'],
+            'projectid' => 0,
+            'email' => $ascok['email'],
+            'subject' => $_POST['tsnotes'],
+            'status' => 'Open',
+            'priority' => 'Normal',
+            'timestamp' => date('Y-m-d H:i:s'),
+            'timespent' => 0,
+            'reported' => $liu['name'],
+            'reported_ip' => gethostbyaddr($_SERVER['REMOTE_ADDR']),
+            'reported_email' => $liu['email'],
+            'typeasset' => 1,
+            'typeticket' => 2,
+            'assetid' => $ascok['id'],
+            'people_dtl_request_id' => $_POST['peopledtlid'],
+            'ticketidparent' => $_POST['ticketidparent'],
+                    ]);
+            //var_dump($data3);
+            $lastid = $database->insert("tickets_replies", [
+                    "ticketid" => $ticketid,
+                    "peopleid" => $liu['id'],
+                    "message" => $_POST['tsnotes'],
+                    "timestamp" => date('Y-m-d H:i:s'),
+                    "typereplies" => 2,
+                    "statusreplies" => "Open",
+                    "ipaddress" => gethostbyaddr($_SERVER['REMOTE_ADDR']),
+                ]);
+
+            //$lastid2 = $database->query("update assets set tsassignstatus = 1,tsassignnotes = '$_POST[tsnotes]' where id = '$_POST[assetid]'");
+        //die();
+            //Notification::formassets2($ticketid, $_POST['tsnotes'], 11,'Open');
+            include "./phpmailer/pushemailassignts.php";/if ($lastid == "0") { return "11"; } else { logSystem("Ticket Added - ID: " . $lastid); return "10"; }
+            //if ($lastid == "0") { return "11"; } else { logSystem("Ticket Added - ID: " . $lastid); return "10"; }
+        }
+}
+
+
+?>

@@ -1,0 +1,94 @@
+<?php foreach($database->query("select * from licenses where id = $_GET[id]") as $lcs){} 
+      if($_GET[type] == '1'){$judul = "License Used";}
+      else if($_GET[type] == '2'){$judul = "Installed";}
+      else if($_GET[type] == '3'){$judul = "Downgraded";}
+      else if($_GET[type] == '4'){$judul = "No License";}
+?>
+<div class="modal-body">
+    <input style="height:26px; line-height: 0;" type="button" class="btn btn-info" value="Excel"  onclick="tableToExcel('coki')"></button>
+    <div class="form-group pre-scrollable">
+
+        <table id="coki" class="table table-striped table-hover table-bordered">
+            <thead style=" position: sticky; top: 0; z-index: 1;background-color: white;color: black">
+                <tr>
+                    <th colspan="6">
+                        <h4 class="modal-title"><b><?=$judul?></b> - <?=$lcs['name']?></h4>
+                    </th>
+                </tr>
+                <tr>
+                    <th>No</th>
+                    <th>Tag</th>
+                    <th>Type</th>
+                    <th>Category</th>
+                    <th>Name</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php 
+                    $no= 1;
+                    if($_GET[type] == '1'){$sasa = $database->query("select * from licenses_assets where licenseid = '$_GET[id]' order by typeasset");}
+
+                    else if($_GET[type] == '2'){$sasa = $database->query("select * from licenses_assets where inslicenseid = '$_GET[id]' order by typeasset");}
+                    
+                    else if($_GET[type] == '3'){$sasa = $database->query("select * from licenses_assets where licenseid = '$_GET[id]' and inslicenseid != '$_GET[id]' union select * from licenses_assets where licenseid != '$_GET[id]' and inslicenseid = '$_GET[id]'");}
+                    
+                    else if($_GET[type] == '4'){$sasa = $database->query("select * from licenses_assets where licenseid = '$_GET[id]' and leaklicense = 1");}
+                    
+
+                    foreach($sasa as $mlc){
+                        if($mlc[typeasset] == 1){
+                            $asset = getRowById("assets",$mlc['assetid']);
+                            $manufacturerid = getSingleValue("models","manufacturerid",$asset['modelid']);
+                            $modelid = getSingleValue("assets","modelid",$mlc['assetid']);
+                            $types = "Assets";
+                        } else {
+                            $asset = getRowById("virtuals",$mlc['assetid']);
+                            $types = "Virtual Machine";
+                        }
+                        echo "<tr>";
+                        echo "<td>$no</td>";
+                        echo "<td>";echo "<a href='?route=inventory/assets/manage&id=".$asset['id']."'>".$asset['tag']."</a>";
+                            
+                        echo "</td>";
+                        echo "<td>".$types."</td>";
+                        echo "<td>".getSingleValue("assetcategories","name",$asset['categoryid'])."</td>";
+                        echo "<td>";
+                                echo "<a href='?route=inventory/assets/manage&id=".$asset['id']."'>".$asset['name']."</a>";
+                        echo "</td>";
+                        echo "<td>"; if($mlc[leaklicense] == 1){echo "No License";} else {echo $mlc[notes];}
+                        echo "</td>";
+                        echo "</tr>";
+                $no++;} ?>
+                
+            </tbody>
+        </table>
+    </div>
+
+    <input type="hidden" name="action" value="addLicenseAssignment">
+    <input type="hidden" name="licenseid" value="<?php echo $_GET['routeid']; ?>">
+    <input type="hidden" name="route" value="<?php echo $_GET['reroute']; ?>">
+    <input type="hidden" name="routeid" value="<?php echo $_GET['routeid']; ?>">
+    <input type="hidden" name="section" value="">
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default input-sm" data-dismiss="modal" aria-label="Close">Close</button>
+</div>
+
+<script type="text/javascript">
+		$(".select2").select2();
+
+        var tableToExcel = (function() {
+        
+        var uri = 'data:application/vnd.ms-excel;base64,';
+        var template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>';
+        var bases = function(s) { return window.btoa(unescape(encodeURIComponent(s))) };
+        var format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) };
+        return function(table, name) {
+        if (!table.nodeType) table = document.getElementById(table)
+        var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
+        window.location.href = uri + bases(format(template, ctx))
+        }
+
+        })()
+</script>

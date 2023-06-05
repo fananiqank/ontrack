@@ -1,0 +1,129 @@
+<div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title"><?php _e('Add User Account'); ?></h4></div>
+<div class="modal-body">
+
+    <?php if($isAdmin) { ?>
+        <div class="form-group">
+            <label for="clientid"><?php _e('Departements'); ?></label>
+            <select class="form-control select2" id="clientid" name="clientid" style="width: 100%;"  required>
+                <option value="">None</option>
+                <?php 
+                    $lclient= $database->query("select a.id,b.id as locationid,a.name,b.name as locationname from clients a left join locations b on a.id=b.clientid");
+                    foreach ($lclient as $lc) { ?>
+                    <option value='<?php echo $lc['locationid']."_".$lc[id]; ?>' <?php if($lc['locationid'] == $user['locationid']) echo "selected"; else echo "";?> ><?php echo $lc['name']." - ".$lc['locationname']; ?></option>
+                <?php } ?>
+            </select>
+        </div>
+    <?php } ?>
+    <?php if(!$isAdmin) { ?><input type="hidden" name="clientid" value="<?php echo $liu['clientid']; ?>"><?php } ?>
+
+    <div class="form-group">
+        <label for="roleid"><?php _e('Role'); ?></label>
+        <select class="form-control select2 select2-hidden-accessible" id="roleid" name="roleid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+            <?php foreach ($roles as $role) { ?>
+                <option value='<?php echo $role['id']; ?>'><?php echo $role['name']; ?></option>
+            <?php } ?>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="name"><?php _e('No Pegawai'); ?> *</label>
+        <input type="text" class="form-control" id="nogm" name="nogm" autocomplete="off" required>
+    </div>
+    <div class="form-group">
+        <label for="name"><?php _e('Name'); ?> *</label>
+        <input type="text" class="form-control" id="name" name="name" autocomplete="off" required>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="email"><?php _e('Email Address'); ?> *</label>
+                <input type="text" class="form-control" id="email" name="email" autocomplete="off" required>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="password"><?php _e('Password'); ?> *</label>
+                <div class="input-group">
+                    <input type="text" class="form-control passwordinput" id="password" name="password" autocomplete="off" required>
+                    <span class="input-group-btn"><button type="button" class="btn btn-default btn-flat getNewPass" data-toggle='tooltip' title='<?php _e('Generate password'); ?>'><i class="fa fa-refresh"></i></button></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="mobile"><?php _e('Mobile Number'); ?></label>
+                <input type="text" class="form-control" id="mobile" name="mobile" autocomplete="off">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="title"><?php _e('Job Title'); ?></label>
+                <input type="text" class="form-control" id="title" name="title" autocomplete="off">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="mobile"><?php _e('Type User'); ?></label>
+                <select class="form-control select2 select2-hidden-accessible" id="approval_type" name="approval_type" style="width: 100%;" tabindex="-1" aria-hidden="true">
+                    <option value="0">User</option>
+                    <option value="1">Head Approve</option>
+                    <option value="2">IT Approve</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <!--  -->
+        </div>
+    </div>
+
+    <?php if(getConfigValue("ldap_enable") == "true") { ?>
+        <div class="form-group">
+            <label for="ldap_user"><?php _e('LDAP/AD Username'); ?></label>
+            <input type="text" class="form-control" id="ldap_user" name="ldap_user" autocomplete="off">
+        </div>
+    <?php } else { ?>
+        <input type="hidden" name="ldap_user" value="">
+    <?php } ?>
+
+
+    <input type="hidden" name="fcmtoken" value="">
+
+    <!-- <div class="form-group"><div class="checkbox"><label><input type="checkbox" name="notification" value="true" checked="yes"> <?php _e('Send New User Email'); ?></label></div></div> -->
+
+    <input type="hidden" name="action" value="addUser">
+    <input type="hidden" name="route" value="<?php echo $_GET['reroute']; ?>">
+    <input type="hidden" name="routeid" value="<?php echo $_GET['routeid']; ?>">
+    <input type="hidden" name="section" value="<?php echo $_GET['section']; ?>">
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default btn-flat" data-dismiss="modal"><i class="fa fa-times"></i> <?php _e('Cancel'); ?></button>
+    <button type="submit" class="btn btn-primary btn-flat"><i class="fa fa-check"></i> <?php _e('Create'); ?></button>
+</div>
+
+<script type="text/javascript">
+    $(".select2").select2();
+    
+    function generatePassword() {
+        var length = <?php echo getConfigValue("password_generator_length"); ?>,
+        charset = "abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        retVal = "";
+        for (var i = 0, n = charset.length; i < length; ++i) {
+            retVal += charset.charAt(Math.floor(Math.random() * n));
+        }
+        return retVal;
+    }
+
+    $(".getNewPass").click(function(){
+        $(".passwordinput").val(generatePassword());
+    });
+
+	
+
+</script>

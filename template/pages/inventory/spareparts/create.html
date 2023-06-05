@@ -1,0 +1,120 @@
+<!-- Right side column. Contains the navbar and content of the page -->
+<aside class="right-side">
+	<!-- Content Header (Page header) -->
+	<section class="content-header">
+		<h1><a class="btn btn-warning btn-sm btn-flat" href="?route=inventory/spareparts"><?php _e('Back'); ?></a>  &emsp;<?php _e('Spareparts'); ?><small> <?php _e('Manage Spareparts'); ?></small></h1>
+		<ol class="breadcrumb"><li><a href="?route=dashboard"><i class="fa fa-dashboard"></i> <?php _e('Home'); ?></a></li><li><?php _e('Inventory'); ?></li><li><a href="?route=inventory/spareparts"><?php _e('Spareparts'); ?></a></li><li class="active"><?php _e('Create'); ?></li></ol>
+	</section>
+
+	<!-- Main content -->
+	<section class="content">
+		<?php if(!empty($statusmessage)): ?>
+				<div class="row"><div class='col-md-12'><div class="alert alert-<?php print $statusmessage["type"]; ?> alert-auto" role="alert"><?php print __($statusmessage["message"]); ?></div></div></div>
+		<?php endif; ?>
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="box box-primary">
+          			<div class="box-header with-border">
+						<h3 class="box-title"><?php _e('Create New Spareparts'); ?></h3>
+					</div><!-- /.box-header -->
+                    <div class="box-body" id="dawip2">
+						<div class="container-fluid">
+						<div class="row">
+							<form role="form" method="post" class="form-user">
+
+								<div class="col-md-6">
+									<div class="row">
+										<div class="col-md-10">
+											<div class="form-group">
+												<label for="name"><?php _e('Spareparts Name'); ?> *</label>
+												<input type="text" class="form-control" id="name" name="name" required>
+												
+											</div>
+										</div>
+
+										<!-- <div class="col-md-10">
+											<div class="form-group">
+												<label for="categoryid"><?php _e('Grin EIS'); ?> *</label>
+												<select class="form-control select2 select2-hidden-accessible" id="asref" name="asref" style="width: 100%;" tabindex="-1" aria-hidden="true">
+													<option value="0">None</option>
+													<?php foreach ($asrefs as $asref) { echo "<option value='".$asref['id']."'>".$asref['name']."</option>"; } ?>
+												</select>
+											</div>
+										</div> -->
+										
+									</div>
+
+
+								</div>
+
+								<div class="col-md-6">
+									<!-- <div class="row">
+										<div class="col-md-6">
+											<div class="form-group">
+												<label for="statusid"><?php _e('Status'); ?> *</label>
+												<select class="form-control select2 select2-hidden-accessible" id="statusid" name="statusid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+													<?php foreach ($labels as $label) { echo "<option value='".$label['id']."'>".$label['name']."</option>"; } ?>
+												</select>
+											</div>
+										</div>
+									</div> -->
+									<div class="row">
+										<div class="col-md-6">
+											<div class="form-group">
+												<label for="name"><?php _e('Min Stock'); ?> *</label>
+												<input type="text" class="form-control" id="min_stock" name="min_stock" required>
+												
+											</div>
+										</div>
+										
+									</div>
+								</div>
+								<!-- <div class="col-md-6">
+									<div class="row">
+										<div class="col-md-6">
+											<div class="form-group">
+												<label for="name"><?php _e('Spareparts Code'); ?> *</label>
+												<input type="text" class="form-control" id="kode_part" name="kode_part">
+												
+											</div>
+										</div>
+										
+									</div>
+								</div> -->
+								<div class="col-md-12">
+									<div class="form-group">
+										<label for="notes"><?php _e('Notes'); ?></label>
+										<textarea class="form-control summernoteLarge" rows="5" id="notes" name="notes"></textarea>
+									</div>
+
+									<input type="hidden" name="action" value="addSpareparts">
+									<input type="hidden" name="route" value="inventory/spareparts">
+									<input type="hidden" name="routeid" value="">
+
+									<div class="form-group">
+										<button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> <?php _e('Create'); ?></button>
+									</div>
+								</div>
+
+
+							</form><!-- /.form -->
+						</div>
+					</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+	</section><!-- /.content -->
+</aside><!-- /.right-side -->
+<script type="text/javascript">
+
+
+		function spinner (){
+			$('#dawip2').html('<div><img src="spinner.gif" width="10%" style="display:block;margin-left:auto;margin-right:auto;"></div>');
+		}
+
+
+
+</script>

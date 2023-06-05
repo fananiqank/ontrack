@@ -1,0 +1,110 @@
+<!-- Right side column. Contains the navbar and content of the page -->
+<aside class="right-side">
+	<!-- Content Header (Page header) -->
+	<section class="content-header">
+		<h1 class="pull-left"><?php _e('Input Stock Opname'); ?><small> <?php _e('Stock Opname Sparepart'); ?></small></h1>
+		<div class="pull-right"><a href="?route=inventory/transaction/stockopname" class="btn btn-primary btn-flat btn-sm"><?php _e('View'); ?></a></div>
+		<div style="clear:both"></div>
+	</section>
+	<!-- Main content -->
+	<section class="content">
+		<?php if(!empty($statusmessage)): ?>
+				<div class="row"><div class='col-md-12'><div class="alert alert-<?php print $statusmessage["type"]; ?> alert-auto" role="alert"><?php print __($statusmessage["message"]); ?></div></div></div>
+		<?php endif; ?>
+<form role="form" method="post" class="">		
+		<div class="row">
+			<div class="col-sm-12">
+				<label for="name" class="col-sm-1"><?php _e('Gudang'); ?></label>
+        		<div class="col-sm-2">
+					<select class="form-control select2" id="gudangid" name="gudangid" style="width: 100%;">
+			            <?php foreach($database->query("select * from gudang where statusid=1") as $gdg){ 
+			            	if($_GET[gdg]==$gdg[id]){$s="selected";}else{$s="";}
+			            ?>
+			                <option value="<?=$gdg[id]?>" <?=$s?>><?=$gdg[name]?></option>
+			            <?php } ?>
+			        </select>
+				</div>
+				<label for="name" class="col-sm-1"><?php _e('Jenis'); ?></label>
+        		<div class="col-sm-2">
+					<select class="form-control select2" id="jenisbrg" name="jenisbrg" style="width: 100%;">
+			            <option value="1" <?php if($_GET[jns]==1){echo "selected";} ?>>Baru</option>
+			            <option value="2" <?php if($_GET[jns]==2){echo "selected";} ?>>Bekas</option>
+			        </select>
+				</div>
+				<div class="col-sm-2">
+					<a href="javascript:void(0)" class="btn btn-primary btn-sm" onclick="cekso(gudangid.value,jenisbrg.value)">Search</a>
+				</div>
+				<div class="col-sm-4">
+					
+				</div>
+        	</div>
+			<div class="col-xs-12">
+				<div class="box box-primary">
+                    <div class="box-body">
+						<div class="table-responsive pre-scrollable">
+							<button type="submit" class="btn btn-success btn-sm" style="float: left"><i class="fa fa-check"></i> <?php _e('Save Stock Opname'); ?></button>
+							<input type="hidden" name="action" value="addStockOpname">
+						    <input type="hidden" name="route" value="inventory/transaction/stockopname">
+						    
+	                        <table id="dataTablesFullnopaging" class="table table-striped table-hover table-bordered">
+	                            <thead style=" position: sticky; top: 0; z-index: 1;background: white;color: black;border: solid;">
+	                                <tr>
+										<th ><?php _e('Tag'); ?></th>
+										<th ><?php _e('Name'); ?></th>
+										<th ><?php _e('MinStock'); ?></th>
+										<th ><?php _e('QtySystem'); ?></th>
+										<th ><?php _e('QtyFisik'); ?></th>
+										<th ><?php _e('Selisih'); ?></th>
+										<th ><?php _e('Remark'); ?></th>
+	                                </tr>
+	                            </thead>
+	                            <tbody>
+									<?php
+										
+									$no = 1;
+									$sparepartss = $database->query("select a.sparepartid,b.tag,b.name as sparepartname,min_stock,harga, hargajual,stok as stokakhir,no_transmutasi from
+                                (select a.*,
+                                @running_total:=stok - abs(@running_total) AS cumulative_sum from
+                                (select * from (select a.sparepartid, b.no_transmutasi, a.idmutasli as id_mutasi, sum(stok) stok, a.harga, a.hargajual 
+                                from (select sparepartid, no_transmutasi,min(id) as idmutasli,  
+                                case when masukmutasi>0 then id else id_refmutasi1 end as id_mutasi, 
+                                sum(masukmutasi)-sum(keluarmutasi) as stok,harga,hargajual 
+                                from tx_mutasi where jenisbrg='$_GET[jns]' and id_gudang = $_GET[gdg] group by id order by id DESC) a 
+                                join tx_mutasi b on b.id=a.idmutasli group by a.sparepartid) a where stok>0) a 
+                                JOIN (SELECT @running_total:=10, @s:=0) b ) a 
+                                join spareparts b on a.sparepartid=b.id");
+									foreach ($sparepartss as $sparepart) { ?>
+		                                <tr>
+											<td width="20%"><?php echo $sparepart['tag']; ?></td>
+											<td width="30%"><?php echo $sparepart['sparepartname']; ?>
+												<input type="hidden" class="form-control input-sm" id="sparepartid_<?=$no?>" name="sparepartid[]" style="width: 70%;" value="<?=$sparepart[sparepartid]?>" readonly>
+												<input type="hidden" class="form-control input-sm" id="brgmasuk_<?=$no?>" name="brgmasuk[]" style="width: 70%;" value="<?=$sparepart[no_transmutasi]?>" readonly>
+												<input type="hidden" class="form-control input-sm" id="hargabeli_<?=$no?>" name="hargabeli[]" style="width: 70%;" value="<?=$sparepart[harga]?>" readonly>
+											</td>
+											<td width="10%"><?php echo $sparepart['min_stock']; ?></td>
+											<td width="5%"><input type="text" class="form-control input-sm" id="qtysystem_<?=$no?>" name="qtysystem[]" style="width: 70%;" value="<?=$sparepart[stokakhir]?>" readonly></td>
+											<td width="5%"><input type="text" class="form-control input-sm" id="qtyfisik_<?=$no?>" name="qtyfisik[]" style="width: 90%;"  onkeyup='selisihstok(this.value,<?=$sparepart[stokakhir]?>,<?=$no?>)'  ></td>
+											<td width="5%"><input type="text" class="form-control input-sm" id="selisih_<?=$no?>" name="selisih[]" style="width: 90%;"readonly></td>
+											<td width="20%"><input type="text" class="form-control input-sm" id="remark_<?=$no?>" name="remark[]" style="width: 100%;"></td>
+											
+		                                </tr>
+									<?php $no++; } ?>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+</form>
+	</section><!-- /.content -->
+</aside><!-- /.right-side -->
+<script type="text/javascript">
+	function cekso(gudang,jenis){
+		window.location.href="index.php?route=inventory/transaction/stockopnameinput&gdg="+gudang+"&jns="+jenis;
+	}
+	function selisihstok(fisik,system,num){
+	    qtyselisih = (parseInt(fisik)-parseInt(system));
+	      $('#selisih_'+num).val(qtyselisih);
+	}
+</script>

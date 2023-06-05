@@ -1,0 +1,143 @@
+
+<div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title"><?php _e('Add Ticket'); ?></h4></div>
+<div class="modal-body">
+    <div class="row">
+
+        <div class="col-md-8">
+            <div class="form-group">
+                <label for="subject"><?php _e('Problem'); ?></label>
+                <input type="text" class="form-control" id="subject" name="subject" value="" required>
+                <input type="hidden" class="form-control" id="typeasset" name="typeasset" value="<?=$_GET[typeasset]?>" required>
+            </div>
+        </div>
+       <div class="col-md-12">
+            <div class="form-group">
+                <label for="assetid"><?php _e('Asset'); ?></label><br>
+                <select class="form-control select2 select2tags" id="assetid" name="assetid" style="width: 65%;" onchange="assetdetail(this.value)">
+                    <?php 
+                        foreach($database->query("select a.*,b.name as namepeople from assets a left join people b on a.userid=b.id where a.statusid > 0") as $asset){
+                    ?>
+                        <option value="<?php echo $asset['id']; ?>"><?php echo $asset[nodenumber]." - ".$asset[name]." - ".$asset[namepeople]; ?></option>
+                   
+                    <?php } ?>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-12" id="showdetail" style="display: none;">
+            <table width="70%">
+                <tr>
+                    <td><b>Departemen</b></td>
+                    <td>: <span id="depshow"></span>
+                    <input type="hidden" name="depontrack" id="depontrack" class="form-control input-sm" value="" ></td>
+                    <td><b>User</b></td>
+                    <td>: <span id="usershow"></span>
+                    <input name="user_id" id="user_id" type="hidden" class="form-control" value="" /></td>
+                </tr>
+                <tr>
+                    <td><b>Email</b></td>
+                    <td>: <span id="emailshow"></span>
+                    <input type="hidden" class="form-control" id="email" name="email"></td>
+                    <td>&nbsp;</td>
+                    <td>&nbsp;</td>
+                </tr>
+            </table>
+            <br>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="assetid"><?php _e('Reported By'); ?></label><br>
+                <input type="text" class="form-control" id="report_name" name="report_name" value="" required>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="assetid"><?php _e('Reported Email'); ?></label><br>
+                <input type="text" class="form-control" id="report_email" name="report_email">
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="form-group">
+                <label for="assetid"><?php _e('Room'); ?></label><br>
+                <input type="text" class="form-control" id="ticketroom" name="ticketroom" value="" required>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="assetid"><?php _e('Assign To'); ?></label><br>
+                <select class="form-control select2 select2-tag" id="adminid" name="adminid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+                        <?php foreach($database->query("select * from people where type='admin' and id='$liu[id]'") as $admin) { ?>
+                        <option value='<?php echo $admin['id']; ?>' <?php if(isset($liu['id'])) { if($liu['id'] == $admin['id']) echo "selected"; }  ?>><?php echo $admin['name']; ?></option>
+                    <?php } ?>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="assetid"><?php _e('Priority'); ?></label><br>
+                <select class="form-control select2" id="priority" name="priority" style="width: 100%;">
+                    <option value="Low" <?php if($ticket['priority'] == "Low") echo "selected"; ?>><?php _e('Low'); ?></option>
+                    <option value="Normal" <?php if($ticket['priority'] == "Normal") echo "selected"; ?>><?php _e('Normal'); ?></option>
+                    <option value="High" <?php if($ticket['priority'] == "High") echo "selected"; ?>><?php _e('High'); ?></option>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="assetid"><?php _e('Category (Target Time)'); ?></label><br>
+                <select class="form-control select2" id="slaid" name="slaid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+                    <?php foreach($database->query("select * from tickets_sla") as $sla){ ?>
+                        <option value="<?=$sla[id]?>" <?php if($sla[id] == $ticket[slaid]){echo "selected";} ?>><?=$sla['name']." - ".$sla['sla']?></option>
+                    <?php } ?>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="assetid"><?php _e('Status'); ?></label><br>
+                <select class="form-control select2" id="status" name="status" style="width: 100%;">
+                    <option value="In Progress"><?php _e('In Progress'); ?></option>
+                    <option value="Hold"><?php _e('Hold'); ?></option>
+                    <!-- <option value="Finished"><?php _e('Finished'); ?></option> -->
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="assetid"><?php _e('Remark'); ?></label><br>
+                <textarea class="form-control" id="remark" name="remark"></textarea>
+            </div>
+        </div>
+    <input type="hidden" name="action" value="addTicket">
+    <input type="hidden" name="route" value="<?php echo $_GET['reroute']; ?>">
+    <input type="hidden" name="routeid" value="<?php echo $_GET['routeid']; ?>">
+    <input type="hidden" name="section" value="<?php echo $_GET['section']; ?>">
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default btn-flat" data-dismiss="modal"><i class="fa fa-times"></i> <?php _e('Cancel'); ?></button>
+    <button type="submit" class="btn btn-primary btn-flat"><i class="fa fa-check"></i> <?php _e('Create'); ?></button>
+</div>
+
+<script type="text/javascript">
+$( document ).ready(function() {
+   $(".select2").select2({
+    dropdownParent: $(".modal-header")});
+});
+
+function assetdetail(id){
+    $.ajax({
+            type: 'GET',
+            url: "template/modals/tickets/sourcedata.php?id="+id,
+            success: function(ui) {
+                expui = ui.split('_');
+                $('#showdetail').show();
+                $("#depontrack").val(expui[0]);
+                $('#user_id').val(expui[1]);
+                $('#email').val(expui[2]);
+                $('#depshow').html(expui[3]);
+                $('#usershow').html(expui[4]);
+                $('#emailshow').html(expui[2]);
+            }
+    });
+}
+      
+</script>

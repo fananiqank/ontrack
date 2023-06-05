@@ -1,0 +1,290 @@
+<!-- Right side column. Contains the navbar and content of the page -->
+
+<?php global $liu; ?>
+<aside class="right-side">
+	<!-- Content Header (Page header) -->
+	<section class="content-header">
+		<h1><?php _e('Dashboard'); ?></h1>
+		<ol class="breadcrumb"><li><a href="?route=dashboard"><i class="fa fa-dashboard"></i> <?php _e('Home'); ?></a></li><li class="active"><?php _e('Dashboard');  ?></li></ol>
+	</section>
+
+	<!-- Main content -->
+	<section class="content">
+		<?php if(!empty($statusmessage)): ?>
+				<div class="row"><div class='col-md-12'><div class="alert alert-<?php print $statusmessage["type"]; ?> alert-auto" role="alert"><?php print __($statusmessage["message"]); ?></div></div></div>
+		<?php endif; ?>
+		<?php if(file_exists("install") == 1): ?>
+			  <div class="row"><div class='col-md-12'><div class="alert alert-danger" role="alert"><b><?php _e('Plese delete the "install" directory!'); ?></b></div></div></div>
+	    <?php endif; ?>
+	  <!-- Small boxes (Stat box) -->
+       <div class="row">
+         <div class="col-lg-3 col-xs-6">
+           <!-- small box -->
+           <div class="small-box bg-blue">
+             <div class="inner">
+               <h3><?php echo $sumAssets; ?></h3>
+               <p><?php _e('Assets Owned'); ?></p>
+             </div>
+             <div class="icon">
+               <i class="fa fa-desktop"></i>
+             </div>
+             <a href="?route=inventory/assets" class="small-box-footer"><?php _e('View all'); ?> <i class="fa fa-arrow-circle-right"></i></a>
+           </div>
+         </div>
+         <div class="col-lg-3 col-xs-6">
+           <!-- small box -->
+           <div class="small-box bg-blue">
+             <div class="inner">
+               <h3><?php echo $sumAssetsRent; ?></h3>
+               <p><?php _e('Assets Rent'); ?></p>
+             </div>
+             <div class="icon">
+               <i class="fa fa-desktop"></i>
+             </div>
+             <a href="?route=inventory/assets" class="small-box-footer"><?php _e('View all'); ?> <i class="fa fa-arrow-circle-right"></i></a>
+           </div>
+         </div>
+         <!-- ./col -->
+         <div class="col-lg-3 col-xs-6">
+           <!-- small box -->
+           <div class="small-box bg-green">
+             <div class="inner">
+               <h3><?php echo $sumLicenses; ?></h3>
+               <p><?php _e('Licenses'); ?></p>
+             </div>
+             <div class="icon">
+               <i class="fa fa-certificate"></i>
+             </div>
+             <a href="?route=inventory/licenses" class="small-box-footer"><?php _e('View all'); ?> <i class="fa fa-arrow-circle-right"></i></a>
+           </div>
+         </div>
+         <!-- ./col -->
+		 <div class="col-lg-3 col-xs-6">
+			<!-- small box -->
+			<div class="small-box bg-yellow">
+			  <div class="inner">
+				<h3><?php echo $sumVirtuals; ?></h3>
+				<p><?php _e('Virtual Machine'); ?></p>
+			  </div>
+			  <div class="icon">
+				<i class="fa fa-rocket"></i>
+			  </div>
+			  <a href="?route=inventory/virtuals" class="small-box-footer"><?php _e('View all'); ?> <i class="fa fa-arrow-circle-right"></i></a>
+			</div>
+		  </div>
+         
+  </div>
+       <!-- /.row -->
+
+  <div class="row">
+ 	     <div class="col-md-12">
+ 	   		<div class="box box-primary">
+ 	   			<div class="col-md-4">
+ 	   				<b>Year : </b>
+ 	   				<select id="tck3" class="select2 input-sm" style="width: 40%;" onchange="reloaddash(this.value)">
+					    <?php 
+					      foreach($database->query("select YEAR(`timestamp`) tahun from tickets GROUP BY YEAR(`timestamp`)") as $syear){
+					      	if($_GET[th] == $syear[tahun]){$s='selected';}else{$s='';}
+					        echo "<option value='".$syear[tahun]."' ".$s.">".$syear[tahun]."</option>";
+					      }
+					     ?>
+					  </select>
+ 	   			</div>
+ 	   			<div class="col-md-8" >
+ 	   				<h4>Dashboard Ticketing</h4>
+ 	   			</div>
+			  	
+				</div>
+ 			</div>
+ 			<div class="col-md-7">
+ 	   		<div class="box box-primary">
+			  	<div class="box-header with-border">
+						<h3 class="box-title"><?php _e('Tickets Request'); ?></h3>
+						<div class="box-tools pull-right">
+				  		<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+						</div>
+			  	</div>
+			  	<div class="box-body">
+					  <div class="row pre-scrollable" style="max-height: 220px;font-size: 12px;" >
+	            <?php include "ticketchart3.php"; ?>
+		        </div>
+	              <!-- /.row -->
+		  		</div>
+			  <!-- /.box-body -->
+				</div>
+ 			</div>
+ 			<div class="col-md-5">
+				  <div class="box box-primary" >
+            <div class="box-header">
+              <i class="fa fa-tasks"></i>
+              <h3 class="box-title">Summary Ticket Th. <?=$_GET['th']?></h3>
+	 						<div class="box-tools pull-right">
+	 					  	<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+	 						</div>
+	 	        </div>
+	 	              <!-- /.box-header -->
+	 	        <div class="box-body">
+	 						<?php 
+	 							foreach($database->query("select count(id) total from tickets where typeticket in (1,2) and YEAR(timestamp) = '".$_GET['th']."'") as $sticket){}
+	 							foreach($database->query("select count(id) total from tickets where typeticket in (3) and YEAR(timestamp) = '".$_GET['th']."'") as $dticket){}
+
+	 						 ?>
+	 						<table width="100%">
+	 							<tr>
+	 								<td colspan="3" align="left"><b>Ticket IT Support</b></td>
+	 								<td colspan="3" align="left"><b>Ticket Form Request</b></td>
+	 							</tr>
+	 							<tr>
+	 								<td><b>Total</b></td>
+	 								<td colspan="2"><b>By Status</b></td>
+	 								<td><b>Total</b></td>
+	 								<td colspan="2"><b>By Status</b></td>
+	 							</tr>
+	 							<tr>
+	 								<td valign="top" width="10%"><h3><?=$sticket['total']?></h3> </td>
+	 								<td valign="top" width="10%"><?php 
+	 										echo "Open : <br>";
+	 										echo "Assigned : <br>";
+	 										echo "In Progress : <br>";
+	 										echo "Finished : <br>";
+	 										echo "Closed : <br>";
+	 										echo "Hold : <br>";
+	 										echo "Reject : <br>";
+	 								?></td>
+	 								<td valign="top" width="7%"><?php 
+	 									foreach($database->query("select 
+(select count(id) total from tickets where typeticket in (1,2) and YEAR(timestamp) = '".$_GET['th']."' and `status` = 'Open') open,
+(select count(id) total from tickets where typeticket in (1,2) and YEAR(timestamp) = '".$_GET['th']."' and `status` = 'Assigned') assigned,
+(select count(id) total from tickets where typeticket in (1,2) and YEAR(timestamp) = '".$_GET['th']."' and `status` = 'In Progress') progress,
+(select count(id) total from tickets where typeticket in (1,2) and YEAR(timestamp) = '".$_GET['th']."' and `status` = 'Finished') finished,
+(select count(id) total from tickets where typeticket in (1,2) and YEAR(timestamp) = '".$_GET['th']."' and `status` = 'Closed') closed,
+(select count(id) total from tickets where typeticket in (1,2) and YEAR(timestamp) = '".$_GET['th']."' and `status` = 'Hold') hold,
+(select count(id) total from tickets where typeticket in (1,2) and YEAR(timestamp) = '".$_GET['th']."' and `status` = 'Reject') reject") as $totticket){
+												echo $totticket['open']."<br>".$totticket['assigned']."<br>".$totticket['progress']."<br>".$totticket['finished']."<br>".$totticket['closed']."<br>".$totticket['hold']."<br>".$totticket['reject']."<br>";
+	 									} ?>
+	 								</td>
+	 							
+	 							  <td valign="top" width="8%"><h3><?=$dticket['total']?></h3> </td>
+	 								<td valign="top" width="10%"><?php 
+	 										echo "Open : <br>";
+	 										echo "Assigned : <br>";
+	 										echo "In Progress : <br>";
+	 										echo "Finished : <br>";
+	 										echo "Closed : <br>";
+	 										echo "Hold : <br>";
+	 										echo "Reject : <br>";
+	 								?></td>
+	 								<td valign="top" width="7%"><?php foreach($database->query("select 
+(select count(id) total from tickets where typeticket in (3) and YEAR(timestamp) = '".$_GET['th']."' and `status` = 'Open') open,
+(select count(id) total from tickets where typeticket in (3) and YEAR(timestamp) = '".$_GET['th']."' and `status` = 'Assigned') assigned,
+(select count(id) total from tickets where typeticket in (3) and YEAR(timestamp) = '".$_GET['th']."' and `status` = 'In Progress') progress,
+(select count(id) total from tickets where typeticket in (3) and YEAR(timestamp) = '".$_GET['th']."' and `status` = 'Finished') finished,
+(select count(id) total from tickets where typeticket in (3) and YEAR(timestamp) = '".$_GET['th']."' and `status` = 'Closed') closed,
+(select count(id) total from tickets where typeticket in (3) and YEAR(timestamp) = '".$_GET['th']."' and `status` = 'Hold') hold,
+(select count(id) total from tickets where typeticket in (3) and YEAR(timestamp) = '".$_GET['th']."' and `status` = 'Reject') reject") as $totticket){
+												echo $totticket['open']."<br>".$totticket['assigned']."<br>".$totticket['progress']."<br>".$totticket['finished']."<br>".$totticket['closed']."<br>".$totticket['hold']."<br>".$totticket['reject']."<br>";
+	 									} ?>
+	 								</td>
+	 							
+	 							</tr>
+	 						</table>
+	 	        </div>
+	 	        
+	 	      </div>
+      
+			</div>
+	</div>
+	<div class="row">
+			<div class="col-md-4">
+ 	   		<div class="box box-primary">
+			  	<div class="box-header with-border">
+						<h3 class="box-title"><?php _e('Top 5 Assets Report'); ?></h3>
+						<div class="box-tools pull-right">
+				  		<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+						</div>
+			  	</div>
+			  	<div class="box-body">
+					  <div class="row pre-scrollable" style="max-height: 220px;font-size: 12px;" >
+	            <?php include "ticketchart1.php"; ?>
+		        </div>
+	              <!-- /.row -->
+		  		</div>
+			  <!-- /.box-body -->
+				</div>
+ 			</div>
+ 			<div class="col-md-4">
+				  <div class="box box-primary">
+				  	<div class="box-header with-border">
+							<h3 class="box-title"><?php _e('Top 5 Dept Request Ticket'); ?></h3>
+							<div class="box-tools pull-right">
+					  		<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+							</div>
+				  	</div>
+				  	<div class="box-body">
+						  <div class="row pre-scrollable" style="max-height: 220px;font-size: 12px;" >
+		            <?php include "ticketchart2.php"; ?>
+			        </div>
+		              <!-- /.row -->
+			  		</div>
+				  <!-- /.box-body -->
+					</div>
+			</div>
+			<div class="col-md-4">
+				  <div class="box box-primary">
+				  	<div class="box-header with-border">
+							<h3 class="box-title"><?php _e('Top 5 IT Closed Ticket'); ?></h3>
+							<div class="box-tools pull-right">
+					  		<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+							</div>
+				  	</div>
+				  	<div class="box-body">
+						  <div class="row pre-scrollable" style="max-height: 220px;font-size: 12px;" >
+		            <?php include "ticketchart4.php"; ?>
+			        </div>
+		              <!-- /.row -->
+			  		</div>
+				  <!-- /.box-body -->
+					</div>
+			</div>
+		</div>
+ 	</div>
+
+	
+   <input type="hidden" name="sesi" id="sesi" value="<?=$liu[id]?>">
+
+	</section><!-- /.content -->
+</aside><!-- /.right-side -->
+
+
+
+<!-- ChartJS 1.0.1 -->
+<script src="template/assets/plugins/chartjs/Chart.min.js"></script>
+
+<?php
+	$first  = strtotime('first day next month');
+	$last6F = array();
+	for ($i = 6; $i >= 1; $i--) { array_push($last6F, date('F', strtotime("-$i month", $first))); }
+
+	$last6YM = array();
+	for ($i = 6; $i >= 1; $i--) { array_push($last6YM, date('Y-m', strtotime("-$i month", $first))); }
+?>
+
+<script>
+	 
+	$( document ).ready(function() {
+    $.ajax({
+				type: 'GET',
+				url: "template/pages/cekticket.php?id="+$('#sesi').val(),
+				success: function(ui) {
+					
+					if(ui > 0){alert("Anda memiliki ticket yang belum di proses sebanyak "+ui+"\nCek Active Ticket");
+						
+					}
+				}
+		});
+	});
+		
+	function reloaddash(tahun){
+		window.location.href="index.php?route=dashboard&th="+tahun;
+	}
+</script>

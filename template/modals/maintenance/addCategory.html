@@ -1,0 +1,326 @@
+<div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title"><?php _e('Maintenance'); ?></h4></div>
+<div class="modal-body">
+<?php $dated = date('Y-m-d'); 
+      if($dated > $_GET['date']){$disganti = "display:block";}else{$disganti = "display:none";}     
+?>
+
+    <div class="form-group">
+        <div class="col-md-6">
+            <label for="name">Type Input</label> <br>
+            <!-- <input type="radio" id="plan" name="typemtc" value="1" onclick="cekganti(1)" <?php if($dated < $_GET['date']){echo "checked";} ?> required>&nbsp;Planning
+            &emsp; -->
+            <input type="radio" id="real" name="typemtc" value="2" onclick="cekganti(2)" <?php if($dated > $_GET['date']){echo "checked";} ?>>&nbsp;Realisasi
+        </div>
+        <div class="col-md-6">
+            <label for="name"><?php _e(Tanggal); ?></label>
+            <input type="text" class="form-control" id="tgl_mtc" name="tgl_mtc" value="<?=$_GET[date]?>" readonly>
+        </div>        
+    </div>
+
+    <div class="form-group">
+        <div class="col-md-6">
+            <label for="clients"><?php _e('Assets'); ?></label>
+        <!-- <select class="form-control select2tags" id="clients" name="clients[]" style="width: 100%;" multiple>
+            <option value="0" selected><?php _e('None'); ?></option>
+            <?php 
+                $asts = $database->query("select * from assets");
+                foreach($asts as $ast) { ?>
+                <option value="<?php echo $ast['id']; ?>"><?php echo $ast['name']; ?></option>
+            <?php } ?>
+        </select> -->
+            <select class="form-control select2 select2tags" id="assetid" name="assetid" style="width: 100%;">
+                <option value="0" selected><?php _e('None'); ?></option>
+                <?php 
+                    if($_GET[ticketid]!= ""){
+                         foreach($database->query("select * from tickets where id=$_GET[ticketid]") as $tck){}
+                         $wh = "and a.id=$tck[assetid]";
+                    } else {
+                        $wh = "";
+                    }
+                   
+
+                    $asts = $database->query("select a.*,b.name as namepeople from assets a left join people b on a.userid=b.id where a.statusid > 0 $wh");
+                    foreach($asts as $ast) { ?>
+                    <option value="<?php echo $ast['id']; ?>"><?php echo $ast['nodenumber'].' - '.$ast['name'].' - '.$ast['namepeople']; ?></option>
+                <?php } ?>
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label for="clients"><?php _e('Noted'); ?></label>
+            <textarea class="form-control" name="notedmtc" id="notedmtc"></textarea>
+        </div>
+    </div>
+<div id="ganti" style="<?=$disganti?>">
+    <div class="form-group">
+        <div class="col-md-6">
+        <label for="clients"><?php _e('Jenis Penggantian Sparepart'); ?></label>
+            <select class="form-control select2" id="jenismtc" name="jenismtc" style="width: 100%;" onchange="spjam(this.value)">
+                <option value="0">Pilih Jenis Penggantian</option>
+                <option value="1">Penambahan</option>
+                <!-- <option value="2">Penggantian</option> -->
+                <option value="3">Pelepasan</option>
+            </select>
+        </div>
+        <div class="col-md-6 spat">
+            <label for="clients"><?php _e('Sparepart'); ?></label>
+            <select class="form-control select2" id="sparepartid" name="sparepartid" style="width: 100%;" onchange="cekqty(this.value,gudangid.value,jenisbrg.value)">
+                <option value="0" selected><?php _e('None'); ?></option>
+                <?php 
+                    $sprs = $database->query("select * from spareparts where statusid > 0");
+                    foreach($sprs as $spr) { ?>
+                    <option value="<?php echo $spr['id']; ?>"><?php echo $spr['name']; ?></option>
+                <?php } ?>
+            </select>
+        </div>
+    </div>
+    <div class="form-group spat">   
+        <div class="col-md-6">
+            <label for="clients"><?php _e('Gudang'); ?></label>    
+            <select class="form-control select2" id="gudangid" name="gudangid" style="width: 100%;" onchange="cekqty2(sparepartid.value,this.value,jenisbrg.value)">
+                <option value="0">Pilih Gudang</option>
+                <?php foreach($database->query("select * from gudang where statusid = 1") as $gdg){
+                    echo "<option value='".$gdg[id]."'>".$gdg[name]."</option>";
+                } ?>
+            </select>
+        </div> 
+        <div class="col-md-6 spat">
+            <label for="color"><?php _e('Type'); ?></label>
+            <div>
+                <div class="col-md-6" id="tbrg" style="display: block;">
+                    <select class="form-control select2" id="jenisbrg" name="jenisbrg" style="width: 100%;" onchange="cekqty3(sparepartid.value,gudangid.value,this.value)">
+                        <option value="1">Baru</option>
+                        <option value="2">Bekas</option>
+                    </select>
+                </div>
+                <div class="col-md-3" id="qnow" style="display: block;"> 
+                    <input type="text" name="qty" id="qty" class="form-control" style="margin-left: 10%;width: 100%;" placeholder="Pcs">
+                </div> 
+                <div class="col-md-3" id="qnow" style="display: block;"> 
+                    <input type="text" name="qtynow" id="qtynow" class="form-control" style="margin-left: 10%;width: 100%;" readonly>
+                </div> 
+            </div>
+        </div>
+    </div>
+    <div class="form-group" align="center">
+        <br>
+        <a href="javascript:void(0)" class="btn btn-success" onclick="saverec()" style="margin-top: 3%;">Add</a>
+    </div>
+    <div class="form-group row pre-scrollable" id="listsparepart" style="max-height:200px;margin-left: 10px;">
+        <?php include 'keranjang.php'; ?>
+    </div>
+</div>
+    <input type="hidden" name="action" value="addmaintenance">
+    <input type="hidden" name="route" value="<?php echo $_GET['reroute']; ?>">
+    <input type="hidden" name="routeid" value="">
+    <input type="hidden" name="section" value="">
+    <input type="hidden" name="userid" id="userid" value="<?=$liu[id]?>">
+    <input type="hidden" name="ticketid" id="ticketid" value="<?=$_GET[ticketid]?>">
+    <div class="form-group row" style="margin-left:10px;">
+        <br>
+        <div class="row col-md-12" >
+            <button type="button" class="btn btn-default" data-dismiss="modal" style="margin-top:5px;"><i class="fa fa-times"></i> <?php _e('Cancel'); ?></button>
+            <button type="submit" class="btn btn-primary" style="margin-top:5px;"><i class="fa fa-check"></i> <?php _e('Create'); ?></button>
+        </div>
+    </div>
+    <hr>
+    <div class="form-group pre-scrollable" style="max-height: 205px;">
+        <table class="table ">
+            <thead style=" position: sticky; top: 0; z-index: 1;background-color: white;color: black">
+                <tr>
+                    <th>No MTC</th>
+                    <th>Assets</th>
+                    <!-- <th>Planning</th>
+                    <th>Input Plan</th> -->
+                    <th>Realisasi</th>
+                    <th>Input Real</th>
+                    <th>Noted</th>
+                    <th>Det</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php 
+                    $no = 1;
+                    foreach($database->query("select case when type_input = 1 then 'Planning' when type_input = 2 then 'Realisasi' end typeinput,b.name as assetname,c.name as username,type_input,d.tgl_mtc as tgl_plan,e.tgl_mtc as tgl_real,d.username as userplan,e.username as userreal,a.notedmtc,f.name as namepeople,b.id as idaset,a.nomtc
+from maintenance a join assets b on a.assetid=b.id join people c on a.userid=c.id 
+left join (select tgl_mtc,c.name as username,assetid from maintenance a join people c on a.userid=c.id where type_input = 1) d on a.assetid=d.assetid
+left join (select tgl_mtc,c.name as username,assetid from maintenance a join people c on a.userid=c.id where type_input = 2) e on a.assetid=e.assetid
+left join people f on b.userid=f.id
+where a.tgl_mtc = '$_GET[date]' group by a.assetid") as $tp){ ?>
+                <tr>
+                    <td><?=$tp[nomtc]?></td>
+                    <td><?=$tp['assetname'].'-'.$tp['namepeople']?></td>
+                    <!-- <td><?=$tp['tgl_plan']?></td>
+                    <td><?=$tp['userplan']?></td> -->
+                    <td><?=$tp['tgl_real']?></td>
+                    <td><?=$tp['userreal']?></td>
+                    <td><?=$tp['notedmtc']?></td>
+                    <td><a href="?route=inventory/assets/manage&id=<?=$tp[idaset]?>&section=mtclog" class="btn btn-info btn-sm" target="_blank">Dtl</a></td>
+                </tr>
+                <?php $no++;} ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal" aria-label="Close">Close</button>
+</div>
+
+<script type="text/javascript">
+     $( document ).ready(function() {
+       $(".select2").select2({
+        dropdownParent: $(".modal-header")});
+    });
+        function spjam(val){
+            if(val == 0){
+                // $('.spat').hide();
+                //  $('#sparepartid').val(0).trigger('change');
+                //  $('#gudangid').val(0).trigger('change');
+                //  $('#qtynow').val('');
+            } else {
+                // $('.spat').show();
+                //  $('#sparepartid').val(0).trigger('change');
+                //  $('#gudangid').val(0).trigger('change');
+                //  $('#qtynow').val('');
+                if(val == 3){
+                    $('#qnow').hide();
+                    $('#tbrg').hide();
+                    $("#qtynow").val('');$("#sparepartid").val(0).trigger('change');$("#qty").val('');
+                } else {
+                    $('#qnow').show();
+                    $('#tbrg').show();
+                    $("#qtynow").val('');$("#sparepartid").val(0).trigger('change');$("#qty").val('');
+                }
+            }
+            
+        }
+
+        function cekqty(id,gudang,jenis){
+            if($('#jenismtc').val() == 0){
+                alert("jenis penggantian sparepart harus diisi!");
+
+            } else {
+                if(id > 0 && $('#jenismtc').val() != 3){
+                    $.ajax({
+                        type: 'GET',
+                        url: "template/modals/outgoing/cekqty.php?id="+id+"&gdg="+gudang+"&jns="+jenis,
+                        success: function(ui) {
+                            
+                            if(ui <= 0){alert("Stok Kurang!!");$("#qtynow").val('');$("#sparepartid").val(0).trigger('change');$("#qty").val('');}
+                            else {$("#qtynow").val(ui);}
+                        }
+                    });
+                }
+            }
+            
+
+        }
+        function cekqty2(id,gudang,jenis){
+            if($('#jenismtc').val() == 0){
+                alert("jenis penggantian sparepart harus diisi!");
+            } else {
+                if(id > 0 && $('#jenismtc').val() != 3){
+                    $.ajax({
+                        type: 'GET',
+                        url: "template/modals/outgoing/cekqty.php?id="+id+"&gdg="+gudang+"&jns="+jenis,
+                        success: function(ui) {
+                            
+                            if(ui <= 0){alert("Stok Kurang!!");$("#qtynow").val('');$("#sparepartid").val(0).trigger('change');$("#qty").val('');}
+                            else {$("#qtynow").val(ui);}
+                        }
+                    });
+                }
+            }
+
+        }
+        function cekqty3(id,gudang,jenis){
+            if($('#jenismtc').val() == 0){
+                alert("jenis penggantian sparepart harus diisi!");
+            } else {
+                if(id > 0 && $('#jenismtc').val() != 3){
+                    $.ajax({
+                        type: 'GET',
+                        url: "template/modals/outgoing/cekqty.php?id="+id+"&gdg="+gudang+"&jns="+jenis,
+                        success: function(ui) {
+                            
+                            if(ui <= 0){alert("Stok Kurang!!");$("#qtynow").val('');$("#sparepartid").val(0).trigger('change');$("#qty").val('');}
+                            else {$("#qtynow").val(ui);}
+                        }
+                    });
+                }
+            }
+
+        }
+
+        function cekganti(val){
+            
+            if(val == 2){
+                $('#ganti').show();
+            } else {
+                $('#ganti').hide();
+            }
+        }
+            
+        function saverec(){
+           var sparepart = $("#sparepartid").val();
+           var qty = $("#qty").val();
+           var userid = $("#userid").val();
+           var jnsbrg = $('#jenisbrg').val();
+           var jnsmtc = $('#jenismtc').val();
+           var gudangid = $('#gudangid').val();
+
+            if(sparepart == 0 || qty == '' || qty == 0){
+                alert("Sparepart / qty harus di isi!!");
+            }else if(qty > $('#qtynow').val()){
+                alert("Qty melebihi stok!");
+            }else {
+                var formData = new FormData();
+              formData.append("sparepart", sparepart);
+              formData.append("qty", qty);
+              formData.append("userid", userid);
+              formData.append("jnsbrg", jnsbrg);
+              formData.append("jnsmtc", jnsmtc);
+              formData.append("gudangid", gudangid);
+
+              var xhttp = new XMLHttpRequest();
+
+              // Set POST method and ajax file path
+              xhttp.open("POST", "template/modals/maintenance/proses.php", true);
+
+              // call on request changes state
+              xhttp.onreadystatechange = function() {
+                 if (this.readyState == 4 && this.status == 200) {
+
+                   var response = this.responseText;
+                
+                   if(response > 0){
+                      alert("SUKSES");
+                      $('#listsparepart').load("template/modals/maintenance/keranjang.php?userid="+userid);
+                      $("#sparepartid").val(0).trigger('change');
+                      $('#qty').val('');
+                      $('#qtynow').val('');
+                   } else{
+                      alert("GAGAL");
+                   }
+                 }
+              };
+
+              // Send request with data
+              xhttp.send(formData);
+            }
+          
+        }
+
+        function deleterec(id,userid){
+            $.ajax({
+                    type: 'GET',
+                    url: "template/modals/maintenance/prosesdel.php?id="+id,
+                    success: function(ui) {
+                        $('#listsparepart').load("template/modals/maintenance/keranjang.php?userid="+$("#userid").val());
+                        $("#sparepartid").val(0).trigger('change');
+                        $('#qty').val('');
+                        $('#qtynow').val('');
+                    }
+            });
+        }
+</script>

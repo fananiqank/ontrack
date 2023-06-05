@@ -1,0 +1,39 @@
+[01-Jan-2019 20:46:46 Asia/Jakarta] PHP Warning:  require(phpmailer/PHPMailerAutoload.php): failed to open stream: No such file or directory in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 6
+[01-Jan-2019 20:46:46 Asia/Jakarta] PHP Warning:  require(phpmailer/PHPMailerAutoload.php): failed to open stream: No such file or directory in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 6
+[01-Jan-2019 20:46:46 Asia/Jakarta] PHP Fatal error:  require(): Failed opening required 'phpmailer/PHPMailerAutoload.php' (include_path='.:/opt/alt/php56/usr/share/pear:/opt/alt/php56/usr/share/php') in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 6
+[01-Jan-2019 20:56:22 Asia/Jakarta] PHP Warning:  include(webclass.php): failed to open stream: No such file or directory in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 9
+[01-Jan-2019 20:56:22 Asia/Jakarta] PHP Warning:  include(webclass.php): failed to open stream: No such file or directory in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 9
+[01-Jan-2019 20:56:22 Asia/Jakarta] PHP Warning:  include(): Failed opening 'webclass.php' for inclusion (include_path='.:/opt/alt/php56/usr/share/pear:/opt/alt/php56/usr/share/php') in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 9
+[01-Jan-2019 20:56:22 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 16
+[01-Jan-2019 20:56:46 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 16
+[01-Jan-2019 20:57:14 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 16
+[01-Jan-2019 20:57:20 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 16
+[01-Jan-2019 20:58:04 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 14
+[01-Jan-2019 20:58:05 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 14
+[01-Jan-2019 20:59:15 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 14
+[01-Jan-2019 20:59:16 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 14
+[01-Jan-2019 21:00:09 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 18
+[01-Jan-2019 21:00:10 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 18
+[01-Jan-2019 21:00:11 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 18
+[01-Jan-2019 21:00:56 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 18
+[01-Jan-2019 21:01:00 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 18
+[01-Jan-2019 21:01:53 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 18
+[01-Jan-2019 21:01:55 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 18
+[01-Jan-2019 21:02:06 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 18
+[01-Jan-2019 21:02:07 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 18
+[01-Jan-2019 21:02:23 Asia/Jakarta] PHP Warning:  include(webclass.php): failed to open stream: No such file or directory in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 9
+[01-Jan-2019 21:02:23 Asia/Jakarta] PHP Warning:  include(webclass.php): failed to open stream: No such file or directory in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 9
+[01-Jan-2019 21:02:23 Asia/Jakarta] PHP Warning:  include(): Failed opening 'webclass.php' for inclusion (include_path='.:/opt/alt/php56/usr/share/pear:/opt/alt/php56/usr/share/php') in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 9
+[01-Jan-2019 21:02:23 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 18
+[01-Jan-2019 21:02:58 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 18
+[01-Jan-2019 21:02:59 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 18
+[01-Jan-2019 21:03:01 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 18
+[01-Jan-2019 21:04:20 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 18
+[01-Jan-2019 21:04:21 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 18
+[01-Jan-2019 21:06:00 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 18
+[01-Jan-2019 21:06:38 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 18
+[01-Jan-2019 21:06:52 Asia/Jakarta] PHP Warning:  include(../../webclass.php): failed to open stream: No such file or directory in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 9
+[01-Jan-2019 21:06:52 Asia/Jakarta] PHP Warning:  include(../../webclass.php): failed to open stream: No such file or directory in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 9
+[01-Jan-2019 21:06:52 Asia/Jakarta] PHP Warning:  include(): Failed opening '../../webclass.php' for inclusion (include_path='.:/opt/alt/php56/usr/share/pear:/opt/alt/php56/usr/share/php') in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 9
+[01-Jan-2019 21:06:52 Asia/Jakarta] PHP Fatal error:  Call to a member function select() on null in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 18
+[01-Jan-2019 14:07:44 UTC] PHP Fatal error:  Class 'kelas' not found in /home/njurnalc/public_html/kasir/phpmailer/json_lupapassword.php on line 3

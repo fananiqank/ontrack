@@ -1,0 +1,10 @@
+<?php $config = array(
+    "database_type"=>"mysql",
+    "database_name"=>"itassets",
+    "server"=>"localhost",
+    "username"=>"root",
+    "password"=>"youC1000@",
+    "charset"=>"utf8",
+    "port"=>3306,
+    "encryption_key"=>"29cfa2cab7054466710e903497df1f6393336fd16e6b2d19f2783bcc3ac5a393",
+	"encryption_iv"=>"7c7dc5f336f540e436c6293540be342a1a8d0813e0931874e4b1df71f20263d8" ); ?>

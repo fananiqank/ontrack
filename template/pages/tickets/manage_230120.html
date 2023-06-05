@@ -1,0 +1,653 @@
+<!-- Right side column. Contains the navbar and content of the page -->
+<aside class="right-side">
+	<!-- Content Header (Page header) -->
+	<section class="content-header">
+		<?php if($_GET[rt]){$ret = $_GET[rt]; ?>
+		<h1><a class="btn btn-warning btn-sm btn-flat" href="?route=tickets/<?=$_GET[rt]?>"><?php _e('Back'); ?></a>  &emsp; #<?php echo $ticket['ticket']; ?> </h1>
+		<?php } ?>
+		<ol class="breadcrumb"><li><a href="?route=dashboard"><i class="fa fa-dashboard"></i> <?php _e('Home'); ?></a></li><li><a href="#" onclick="goBack()"><?php _e('Tickets'); ?></a></li><li class="active">#<?php echo $ticket['ticket']; ?></li></ol>
+	</section>
+
+	<!-- Main content -->
+	<section class="content">
+		<?php if(!empty($statusmessage)): ?>
+				<div class="row"><div class='col-md-12'><div class="alert alert-<?php print $statusmessage["type"]; ?> alert-auto" role="alert"><?php print __($statusmessage["message"]); ?></div></div></div>
+		<?php endif; ?>
+		<div class="row">
+			<div class="col-md-8">
+				<div class="nav-tabs-custom">
+					
+	              	<ul class="nav nav-tabs">
+	                	<li <?php if ($section == "") echo 'class="active"'; ?> ><a href="#tab-ticket" data-toggle="tab" class="ticket-tab-button"><?php _e('Ticket'); ?></a></li>
+	                	<?php if($_GET[rt] != 'conv'){ ?>
+	                		<li <?php if ($section == "restime") echo 'class="active"'; ?> ><a href="#tab-restime" data-toggle="tab" class="ticket-tab-button"><?php _e('Response Time'); ?></a></li>
+	                	<?php } ?>
+	  			  		<!-- <?php if(in_array("viewComments",$perms)) { ?><li <?php if ($section == "comments") echo 'class="active"'; ?> ><a href="#tab-comments" data-toggle="tab"><?php _e('Comments'); ?></a></li><?php } ?>
+	                	<?php if(in_array("manageTicketNotes",$perms)) { ?><li <?php if ($section == "notes") echo 'class="active"'; ?> ><a href="#tab-notes" data-toggle="tab"><?php _e('Notes'); ?></a></li><?php } ?> -->
+						<!-- <?php if(in_array("manageTicketRules",$perms)) { ?><li <?php if ($section == "rules") echo 'class="active"'; ?> ><a href="#tab-rules" data-toggle="tab"><?php _e('Rules'); ?></a></li><?php } ?> -->
+						
+
+						<div class="btn-group pull-right" style="padding:6px;">
+					<?php if($_GET[rt] != 'conv'){ ?>
+						<?php if($liu['roleid'] != '2' && $liu['roleid'] != '4' && $liu['roleid'] != '5' && ($ticket['status'] == 'Finished' || $ticket['status'] == 'Closed') ){ ?>
+							<a href='#' onClick='showM("?modal=users/assignTSuser&reroute=tickets/manage&routeid=<?php echo $ticket['id']; ?>&id=<?php echo $ticket['id']; ?>&clientid=<?php echo $ticket['clientid']; ?>&peopleid=<?php echo $ticket['people_dtl_request_id']; ?>&typereq=<?php echo $det['typereq']; ?>&section=");return false' data-toggle='modal' class='btn btn-flat btn-success btn-sm'><i class='fa fa-share'>&nbsp;Assign TS </i></a>
+
+						<?php }?>
+					    <?php  if($ticket['status'] != 'Closed' && $ticket['status'] != 'Finished' && $ticket['status'] != 'Reject'){ ?>
+
+							<!-- <?php if(in_array("viewPReplies",$perms)) { ?><button data-toggle='tooltip' title='<?php _e('Insert Predefined Reply'); ?>' onClick='showM("?modal=preplies/insert");return false' type="button" class="btn btn-default btn-sm btn-flat"><i class="fa fa-arrow-right fw"></i> <?php _e('Predefined Reply'); ?></button><?php } ?> -->
+
+							<?php if(in_array("editTicket",$perms)) { ?><button data-toggle='tooltip' title='<?php _e('Edit Ticket'); ?>' onClick='showM("?modal=tickets/edit&reroute=tickets/manage&routeid=<?php echo $ticket['id']; ?>&id=<?php echo $ticket['id']; ?>&section=");return false' type="button" class="btn btn-default btn-sm btn-flat"><i class="fa fa-edit"></i></button><?php } ?>
+							
+							<!-- <?php if(in_array("addComment",$perms)) { ?><a data-toggle='tooltip' title='<?php _e('New Comment'); ?>' class="btn btn-default btn-sm " href="#" onClick='showM("?modal=comments/add&reroute=tickets/manage&routeid=<?php echo $ticket['id']; ?>&clientid=<?php echo $ticket['clientid']; ?>&projectid=0&ticketid=<?php echo $ticket['id']; ?>&section=comments");return false' class='btn btn-xs text-dark btn-flat'><i class='fa fa-comment'></i></a><?php } ?>
+							<?php if(in_array("manageTicketRules",$perms)) { ?><a data-toggle='tooltip' title='<?php _e('New Rule'); ?>' class="btn btn-default btn-sm " href="#" onClick='showM("?modal=escalationrules/add&reroute=tickets/manage&routeid=<?php echo $ticket['id']; ?>&ticketid=<?php echo $ticket['id']; ?>&section=rules");return false' class='btn btn-xs text-dark btn-flat'><i class='fa fa-level-up'></i></a><?php } ?> -->
+
+							<?php if($isAdmin) { ?><a data-toggle='tooltip' title='<?php _e('Assign to me'); ?>' href="?qa=ticketAssignToMe&reroute=tickets/manage&routeid=<?php echo $ticket['id']; ?>&id=<?php echo $ticket['id']; ?>&beforeid=<?php echo $ticket['adminid']; ?>" class="btn btn-default btn-sm btn-flat"><i class="fa fa-thumb-tack"></i></a><?php } ?>
+
+							<?php if($ticket['status'] != "Closed" && $ticket['status'] != "Finished") { ?>
+								<a data-toggle='tooltip' title='<?php _e('Close Ticket'); ?>' href="?qa=ticketClose&reroute=tickets/manage&routeid=<?php echo $ticket['id']; ?>&id=<?php echo $ticket['id']; ?>" class="btn btn-default btn-sm btn-flat"><i class="fa fa-close"></i></a>
+							<?php } ?>
+							<?php if($isAdmin) { ?>
+								<?php if($ticket['status'] == "Closed" || $ticket['status'] == "Finished") { ?>
+									<a data-toggle='tooltip' title='<?php _e('Reopen Ticket'); ?>' href="?qa=ticketReopen&reroute=tickets/manage&routeid=<?php echo $ticket['id']; ?>&id=<?php echo $ticket['id']; ?>" class="btn btn-default btn-sm btn-flat"><i class="fa fa-retweet"></i></a>
+								<?php } ?>
+							<?php } ?>
+
+							<?php if(in_array("deleteTicket",$perms) && $liu['roleid'] == 1) { ?><button data-toggle='tooltip' title='<?php _e('Delete Ticket'); ?>' onClick='showM("index.php?modal=tickets/delete&reroute=tickets/active&routeid=&section=&id=<?php echo $ticket['id']; ?>");return false' type="button" class="btn btn-default btn-sm btn-flat"><i class="fa fa-trash text-red"></i></button><?php } ?>
+						<?php } 
+						}
+						?>
+
+						</div>
+
+	              	</ul>
+				  	<div class="tab-content">
+						<div class="tab-pane <?php if ($section == "") echo 'active'; ?>" id="tab-ticket">
+						<?php 	if($ticket['status'] != 'Finished' && $ticket['status'] != 'Closed' && $ticket['status'] != 'Reject'){ ?>
+							<form role="form" method="post" enctype="multipart/form-data">
+								<div class="form-group">
+									<textarea class="form-control summernoteTicket" rows="5" id="message" name="message"><?php if(isset($liu['signature'])) echo $liu['signature']; ?></textarea>
+								</div>
+								<div class="row">
+
+									<div class="col-md-2">
+										<?php if($isAdmin) { 
+											?>
+											<div class="form-group">
+												<div class="checkbox">
+													<label><input type="checkbox" name="notification" value="true" checked> <?php _e('Send email notification'); ?></label>
+												</div>
+											</div>
+										<?php } ?>
+									</div> 
+
+
+
+									<div class="col-md-4 text-center">
+										<!-- <div class="form-group">
+											<input class="fileinput" type="file" id="file" name="file[]" multiple>
+										</div> -->
+										<?php if($ticket[idakunmintaticket] == 2){ ?>
+										<input class="form-control" type="text" id="emailinput" name="emailinput" placeholder="masukkan alamat email" style="display:none" required>
+										<?php } ?>
+										<input class="form-control" type="hidden" id="idakunmintaticket" name="idakunmintaticket" value="<?=$ticket[idakunmintaticket]?>">
+										<input class="form-control" type="hidden" id="useridpeople" name="useridpeople" value="<?=$ticket[userid]?>">
+										<input class="form-control" type="hidden" id="peopledtlreqid" name="peopledtlreqid" value="<?=$ticket[people_dtl_request_id]?>">
+									</div>
+
+									<div class="col-md-3 text-center">
+										<?php if($isAdmin) { ?>
+											<select class="form-control" id="status" name="status" onchange="cekemail(this.value)">
+												<!-- <option value="Answered"><?php _e('Set to Answered'); ?></option> -->
+												<option value="In Progress"><?php _e('Set to In Progress'); ?></option>
+											<?php if($_GET[rt] != 'conv'){ ?>
+												<option value="Hold"><?php _e('Set to Hold'); ?></option>
+												<option value="Finished"><?php _e('Set to Finished'); ?></option>
+											<?php } ?>
+												<!-- <option value="Reopened"><?php _e('Set to Reopened'); ?></option> -->
+											</select>
+										<?php 	} else {
+												echo "<input type='hidden' id='status' name='status' value='$ticket[status]'>";
+												} 
+											 
+										?>
+										<?php if(!$isAdmin) { ?><input type="hidden" name="status" value="Reopened"><?php } ?>
+										<input type="hidden" name="approvedbym" value="<?php echo $ticket['approvedby']; ?>">
+									</div>
+
+									<div class="col-md-2 text-right">
+										<button type="submit" class="btn btn-primary btn-flat"><i class="fa fa-reply"></i> <?php _e('Reply'); ?></button>
+									</div>
+									<div class="col-md-1 text-right">
+										<a href="#" class="btn btn-danger btn-flat" title="Add to Discuss" onClick='showM("?modal=discussadd/add&reroute=tickets/manage&routeid=<?php echo $_GET['id']; ?>&id=<?php echo $_GET['id']; ?>&tse=<?php echo $_GET['tse']; ?>&rt=<?php echo $_GET['rt']; ?>");return false' data-toggle='modal'><i class="fa fa-user"></i></a>
+									</div>
+
+								</div>
+
+								<input type="hidden" name="action" value="addTicketReply">
+
+								<input type="hidden" name="ticketid" value="<?php echo $ticket['id']; ?>">
+
+								<?php if($isAdmin) { ?>
+									<input type="hidden" name="adminid" value="<?php echo $liu['id']; ?>">
+									<input type="hidden" name="userid" value="0">
+								<?php } ?>
+
+								<?php if(!$isAdmin) { ?>
+									<input type="hidden" name="adminid" value="0">
+									<input type="hidden" name="userid" value="<?php echo $liu['id']; ?>">
+								<?php } ?>
+
+
+								<input type="hidden" name="route" value="tickets/manage&tse=<?=$_GET[tse]?>&rt=<?=$_GET[rt]?>">
+								<input type="hidden" name="routeid" value="<?php echo $ticket['id']; ?>">
+								<input type="hidden" name="rt" value="<?php echo $_GET[rt]; ?>">
+								<input type="hidden" name="tse" value="<?php echo $_GET[tse]; ?>">
+
+							</form><!-- /.form -->
+						<?php } ?>
+							<ul class="timeline pre-scrollable" style="margin-top:25px;">
+								<?php foreach($replies as $reply) { ?>
+									<li>
+										<!-- timeline icon -->
+										<?php if ($reply['peopleid'] > 0) { ?>
+											<img src="<?php echo getGravatar(getSingleValue("people","email",$reply['peopleid']),"32"); ?>" class="img-circle timeline-image" style="height:32px;width:32px;" />
+										<?php } ?>
+										<?php if ($reply['peopleid'] == 0) { ?>
+											<img src="<?php echo getGravatar($ticket['email'],"32"); ?>" class="img-circle timeline-image" style="height:32px;width:32px;" />
+										<?php } ?>
+										<?php if ($reply['peopleid'] == -1) { ?>
+											<img src="template/assets/icon.png" class="img-circle timeline-image" style="max-height:32px;" />
+										<?php } ?>
+
+										<div class="timeline-item" >
+											<span class="time"><i class="fa fa-clock-o"></i> <?php echo dateTimeDisplay($reply['timestamp']); ?></span>
+
+											<?php if ($reply['peopleid'] > 0) { ?>
+					   			                <h3 class="timeline-header"><a href="#"><?php echo $reply['statusreplies']." - ".getSingleValue("people","name",$reply['peopleid']); ?> [<?php echo __(ucfirst(getSingleValue("people","type",$reply['peopleid']))); ?>]</a> <?php echo smartDate(strtotime($reply['timestamp'])); ?></h3>
+					   						<?php } ?>
+											<?php if ($reply['peopleid'] == 0) { ?>
+												<h3 class="timeline-header"><a href="#"><?php echo $reply['statusreplies']." - ".$ticket['email']; ?>  [<?php _e('Not a registered user'); ?>]</a> <?php echo smartDate(strtotime($reply['timestamp'])); ?></h3>
+											<?php } ?>
+											<?php if ($reply['peopleid'] == -1) { ?>
+												<h3 class="timeline-header"><a href="#">[<?php _e('System'); ?>]</a> <?php echo smartDate(strtotime($reply['timestamp'])); ?></h3>
+											<?php } ?>
+
+											<div class="timeline-body">
+
+												<div class="email-container" style="overflow-x:hidden;">
+													<?php
+													
+														if(isHTML($reply['message'])) {
+															$clean_html = $purifier->purify($reply['message']);
+															echo $clean_html;
+															//echo washtml($clean_html);
+														} else {
+															echo nl2br(washtml($reply['message']));
+														}
+
+													?>
+												</div>
+
+											  	<?php $files = getTableFiltered("files","ticketreplyid",$reply['id']); if(!empty($files)) { ?>
+												  <ul class="todo-list list-inline" id="fileslist">
+													  <?php foreach($files as $file) { ?>
+														  <li id="" style="width:95%;margin:10px;padding:12px;">
+																<div class="row">
+																	<div class="col-xs-1" style="vertical-align:middle"><i class="fa fa-<?php echo File::icon($file['file']); ?>"></i></div>
+																	<div class="col-xs-9">
+																		<?php echo $file['name']; ?>
+																	</div>
+																	<div class="col-xs-2 text-right">
+																		<?php if(in_array("viewFiles",$perms)) { ?><a href="#" onClick='showM("?modal=files/view&reroute=tickets/manage&routeid=<?php echo $ticket['id']; ?>&id=<?php echo $file['id']; ?>&section=");return false' class='btn-right text-dark'><i class='fa fa-eye'></i></a>&nbsp;<?php } ?>
+																		<a href="<?php echo "?qa=download&id=" . $file['id']; ?>" class='btn-right text-dark'><i class='fa fa-download'></i></a>&nbsp;
+																		<a href="#" onClick='showM("?modal=files/delete&reroute=tickets/manage&routeid=<?php echo $ticket['id']; ?>&id=<?php echo $file['id']; ?>&section=");return false' class='btn-right text-red'><i class='fa fa-trash-o'></i></a>
+																	</div>
+																</div>
+
+														  </li>
+													  <?php } ?>
+												  </ul>
+											   <?php } ?>
+
+											</div>
+
+										</div>
+									</li>
+								<?php } ?>
+								<li><i class="fa fa-arrow-up bg-gray"></i></li>
+							</ul>
+
+						</div>
+						<div class="tab-pane <?php if ($section == "restime") echo 'active'; ?>" id="tab-restime">
+							<?php $totaltime = $ticket[slaapprove]+$ticket[slafinished]+$ticket[slaclosed]; ?>
+							<table class="table">
+								<thead>
+									<tr>
+										<td width="20%">&nbsp;</td>
+										<td width="25%"><b>Time</b></td>
+										<td width="35%"><b>PIC</b></td>
+										<td width="20%"><b>Count (Hour)</b></td>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>Created Date</td>
+										<td><?=$ticket['timestamp']?></td>
+										<td><?php echo "- ".$ticket[picuser]."<br> - ".$ticket[reported];?></td>
+										<td><?php //if($ticket['closedate'] == '') {echo $ticket[sla];} ?></td>
+									</tr>
+									<tr>
+										<td>Assigned Date</td>
+										<td><?=$ticket[approvedate]?></td>
+										<td><?=$ticket[picapprove]?></td>
+										<td><?php if($ticket['approvedate'] != ''){echo $ticket[slaapprove];}?></td>
+									</tr>
+									<tr>
+										<td>Finished Date</td>
+										<td><?=$ticket['finishdate']?></td>
+										<td><?php if($ticket['finishdate'] != ''){ echo $ticket['picfinish'];}?></td>
+										<td><?php if($ticket['finishdate'] != ''){echo $ticket['slafinished'];}?></td>
+									</tr>
+									<tr>
+										<td>Closed Date</td>
+										<td><?=$ticket['closedate']?></td>
+										<td><?php if($ticket['closeauto'] == 1){echo "Auto Closed";}else if($ticket['closedate'] != ''){echo $ticket[picuser];}?></td>
+										<td><?php if($ticket['closedate'] != ''){echo $ticket['slaclosed'];}?></td>
+									</tr>
+									
+								</tbody>
+							</table>
+							<?php $sumhold = countTableFiltered("ticket_holdtime","ticketid","$ticket[id]"); 
+								  if($sumhold > 0){$disp = "block";}else{$disp= "none";}
+							?>
+							<table class="table" style="display:<?=$disp?>;">
+								<thead>
+									<tr><td colspan="3"><b>Hold</b></td></tr>
+									<tr>
+										<td width="20%">&nbsp;</td>
+										<td width="25%"><b>Start Hold</b></td>
+										<td width="35%"><b>End Hold</b></td>
+										<td width="20%">&nbsp;</td>
+									</tr>
+								</thead>
+								<tbody>
+								<?php foreach($database->query("select *,CAST(COALESCE(SUBSTRING_INDEX(TIMEDIFF(now(), created_date),':',1),0) AS SIGNED) as slaholdnow,CAST(COALESCE(SUBSTRING_INDEX(TIMEDIFF(closed_date, created_date),':',1),0) AS SIGNED) as slaholdend from ticket_holdtime where ticketid = '$ticket[id]'") as $hd){ ?>
+									<tr>
+										<td><?=$hd[remark]?></td>
+										<td><?=$hd[created_date]?></td>
+										<td><?=$hd[closed_date]?></td>
+										<td><?php if($hd[closed_date] != ''){ $timehold = $hd[slaholdend];}else{$timehold = $hd[slaholdnow];} echo $timehold;?></td>
+									</tr>
+								<?php 
+										$totalhold += $timehold; 
+								} ?>
+
+								</tbody>
+							</table>
+							<table class="table">
+								<thead>
+									<tr>
+										<td width="80%" align="center"><b>Total All Time</b></td>
+										<td width="20%"><?php echo $totaltime-$totalhold; ?></td>
+									</tr>
+									<tr>
+										<td  align="center"><b>Total Handling Time</b></td>
+										<td><?php echo $ticket[slafinished]-$totalhold; ?></td>
+									</tr>
+								</thead>
+							</table>
+						</div>
+						<!-- /.tab-pane -->
+
+						<?php if(in_array("viewComments",$perms)) { ?>
+						<div class="tab-pane <?php if ($section == "comments") echo 'active'; ?>" id="tab-comments">
+							<?php if(!empty($comments)) { ?>
+								<ul class="timeline">
+									<?php $lastdate = "0000-00-00"; foreach($comments as $comment) { ?>
+									<?php
+										$currentdate = date('Y-m-d',strtotime($comment['timestamp']));
+										if($currentdate != $lastdate) { ?><li class="time-label"><span class="bg-gray"><?php echo dateDisplay($currentdate); ?></span></li> <?php $lastdate = $currentdate; } ?>
+									<li>
+									  	<!-- timeline icon -->
+									  	<img src="<?php echo getGravatar(getSingleValue("people","email",$comment['peopleid']),"32"); ?>" class="img-circle timeline-image" style="height:32px;width:32px;" />
+									  	<div class="timeline-item">
+									      	<span class="time"><i class="fa fa-clock-o"></i> <?php echo dateTimeDisplay($comment['timestamp']); ?></span>
+									      	<h3 class="timeline-header"><a href="#"><?php echo getSingleValue("people","name",$comment['peopleid']); ?></a> <?php echo smartDate(strtotime($comment['timestamp'])); ?></h3>
+
+									      	<div class="timeline-body"><?php echo $comment['comment']; ?></div>
+
+									      	<div class="timeline-footer">
+									          	<?php if(in_array("editComment",$perms)) { ?><a onClick='showM("?modal=comments/edit&reroute=tickets/manage&routeid=<?php echo $ticket['id']; ?>&id=<?php echo $comment['id']; ?>&section=comments");return false' class="btn btn-success btn-xs"><?php _e('Edit'); ?></a><?php } ?>
+											  	<?php if(in_array("deleteComment",$perms)) { ?><a onClick='showM("?modal=comments/delete&reroute=tickets/manage&routeid=<?php echo $ticket['id']; ?>&id=<?php echo $comment['id']; ?>&section=comments");return false' class="btn btn-danger btn-xs"><?php _e('Delete'); ?></a><?php } ?>
+									      	</div>
+									  	</div>
+									</li>
+									<?php } ?>
+									<li><i class="fa fa-clock-o bg-gray"></i></li>
+								</ul>
+							<?php } ?>
+							<?php if(empty($comments)) { ?>
+								<p><?php _e('No comments have been added.'); ?></p>
+							<?php } ?>
+						</div>
+						<!-- /.tab-pane -->
+						<?php } ?>
+
+						<?php if(in_array("manageTicketNotes",$perms)) { ?>
+						<div class="tab-pane <?php if ($section == "notes") echo 'active'; ?>" id="tab-notes">
+							<form role="form" method="post">
+									<div class="form-group">
+										<textarea class="form-control summernoteLarge" rows="5" id="notes" name="notes"><?php echo $ticket['notes']; ?></textarea>
+									</div>
+									<input type="hidden" name="action" value="updateTicketNotes">
+									<input type="hidden" name="id" value="<?php echo $ticket['id']; ?>">
+									<input type="hidden" name="route" value="tickets/manage">
+									<input type="hidden" name="routeid" value="<?php echo $ticket['id']; ?>">
+									<input type="hidden" name="section" value="notes">
+									<div class="pull-right"><button type="submit" class="btn btn-success btn-flat"><i class="fa fa-save"></i> <?php _e('Save'); ?></button></div>
+			  					    <div style="clear:both"></div>
+							</form><!-- /.form -->
+						</div>
+						<!-- /.tab-pane -->
+						<?php } ?>
+
+						<?php if(in_array("manageTicketRules",$perms)) { ?>
+						<div class="tab-pane <?php if ($section == "rules") echo 'active'; ?>" id="tab-rules">
+							<div class="table-responsive">
+								<table class="table table-striped table-hover table-bordered">
+									<thead>
+										<tr>
+											<th><?php _e('ID'); ?></th>
+											<th><?php _e('Name'); ?></th>
+											<th><?php _e('Status'); ?></th>
+											<th class="text-right"></th>
+										</tr>
+									</thead>
+									<tbody>
+										<?php
+										foreach ($rules as $rule) {
+										echo "<tr>";
+											echo "<td>".$rule['id']."</td>";
+											echo "<td>".$rule['name']."</td>";
+											echo "<td>";
+												if($rule['executed'] == 0) echo "<span class='badge bg-blue'>".__('Pending')."</span>";
+												if($rule['executed'] != 0) echo "<span class='badge bg-gray'>".__('Processed')."</span>";
+											echo "</td>";
+											echo "<td>";
+												echo "<div class='pull-right btn-group'>";
+												if($rule['executed'] == 0) echo "<a href='#' onClick='showM(\"?modal=escalationrules/edit&reroute=tickets/manage&routeid=".$ticket['id']."&id=".$rule['id']."&section=rules\");return false' class='btn btn-flat btn-success btn-sm'><i class='fa fa-edit'></i></a>";
+												echo "<a href='#' onClick='showM(\"?modal=escalationrules/delete&reroute=tickets/manage&routeid=".$ticket['id']."&id=".$rule['id']."&section=rules\");return false' class='btn btn-flat btn-danger btn-sm'><i class='fa fa-trash-o'></i></a>";
+												echo "</div>";
+
+											echo "</td>";
+										echo "</tr>";
+										}
+										?>
+									</tbody>
+								</table>
+								<?php if(empty($rules)) echo "<p>" . __('No Records Found') . "</p>"; ?>
+							</div>
+
+						</div>
+						<!-- /.tab-pane -->
+						<?php } ?>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-4">
+				<div class="box box-primary">
+					<div class="box-header with-border">
+						<h3 class="box-title"><?php _e('Ticket Details'); ?> </h3>
+						<?php if($ticket['typeticket'] == '2'){ ?>
+							<span style="float: right;">
+								<a href="?route=pdf&type=assetasign&id=<?php echo $ascok[id]; ?>&ticketid=<?php echo $ticket[id]; ?>" class="btn btn-danger btn-sm btn-flat" target="_blank" style="padding:6px;"><i class="fa fa-list fa-fw"></i><?php _e('Print Detail'); ?></a></span>
+						<?php } 
+							$cekpage = getSingleValue("people_dtl_request","typereq","$ticket[people_dtl_request_id]");
+									if($cekpage['typereq'] == 1){$cpage = 'newrequestacc';}
+									else if($cekpage['typereq'] == 2){$cpage = 'newrequestaci';}
+									else if($cekpage['typereq'] == 4){$cpage = 'newrequestacp';}
+						 ?>
+						<?php if($ticket['typeticket'] > '1'){ ?>
+						<span style="float: right;margin-right: 10px;">
+							<a href="http://192.168.31.25/eraticket/cetak.php?page=<?=$cpage?>&id=<?=$ticket[people_dtl_request_id]?>" class="btn btn-info btn-sm btn-flat" target="_blank" style="padding:6px;"><i class="fa fa-folder fa-fw"></i><?php _e('Cek Form'); ?></a></span>
+						<?php } ?>
+					</div><!-- /.box-header -->
+					<div class="box-body">
+						<table id="ticketDetailsTable" class="table table-striped table-hover">
+							<tbody>
+								<tr>
+									<td><b><?php _e('Status'); ?></b></td>
+									<td>
+										<?php if($ticket['status'] == "Open") echo "<span class='badge bg-green'>".__("Open")."</span>"; ?>
+										<?php if($ticket['status'] == "In Progress") echo "<span class='badge bg-navy'>".__("In Progress")."</span>"; ?>
+										<?php if($ticket['status'] == "Answered") echo "<span class='badge bg-teal'>".__("Answered")."</span>"; ?>
+										<?php if($ticket['status'] == "Reopened") echo "<span class='badge bg-orange'>".__("Reopened")."</span>"; ?>
+										<?php if($ticket['status'] == "Closed") echo "<span class='badge bg-gray'>".__("Closed")."</span>"; ?>
+										<?php if($ticket['status'] == "Finished") echo "<span class='badge bg-yellow' style='color:#000000'>Finished</span>"; ?>
+										<?php if($ticket['status'] == "Assigned") echo "<span class='badge bg-blue'>".__("Assigned")."</span>"; ?>
+										<?php if($ticket['status'] == "On Progress") echo "<span class='badge bg-navy'>".__("On Progress")."</span>"; ?>
+										<?php if($ticket['status'] == "Hold") echo "<span class='badge bg-red'>".__("Hold")."</span>"; ?>
+										<?php if($ticket['status'] == "Reject") echo "<span class='badge bg-orenge'>".__("Reject")."</span>"; ?>
+									</td>
+								</tr>
+								<tr>
+									<td><b><?php _e('Category'); ?></b></td>
+									<td><b><?=$ticket[slaname]?></b></td>
+								</tr>
+								<tr>
+									<td><b><?php _e('Target Time'); ?></b></td>
+									<td><font style='font-size:14px;color:#0A98B8'><b><?=$ticket[slatime]?> Hour</b></font></td>
+								</tr>
+								<tr>
+									<td><b><?php _e('Handling'); ?></b></td>
+									<td><?php
+										foreach($database->query("select SUM(CAST(COALESCE(SUBSTRING_INDEX(TIMEDIFF(closed_date, created_date),':',1),0) AS SIGNED)) as slaholdend from ticket_holdtime where ticketid = '$ticket[id]'") as $hd){} 
+
+										if($ticket[status] == 'Closed' || $ticket[status] == 'Finished'){
+											$ticketsla = $ticket[slafinished] - $hd[slaholdend];
+										} else {
+											if($ticket[approvedate] == ''){
+												$ticketsla = $ticket[sla];
+											} else {
+												$ticketsla = $ticket[slamod];
+											}
+										}
+										$bilangan=$ticketsla;
+									    $pembagi=24;
+									    $sisaBagi=$bilangan%$pembagi;
+									    $hasilBagi=($bilangan-$sisaBagi)/$pembagi;
+
+										if ($ticketsla > $ticket[slatime]){echo "<font style='font-size:14px;color:#FF0000'><b> $ticketsla Hour</b></font>";
+										} else if ($ticketsla == $ticket[slatime]){echo "<font style='font-size:14px;color:#0AB84D'><b>$ticketsla Hour</b></font>";
+										} else if ($ticketsla < $ticket[slatime]){echo "<font style='font-size:14px;color:#0A98B8'><b>$ticketsla Hour</b></font>";
+										}
+										
+									    echo "&emsp; <i>(<b>$hasilBagi</b> Days <b>$sisaBagi</b> Hours)</i>";
+
+										 ?></td>
+								</tr>
+								<tr>
+									<td><b><?php _e('Priority'); ?></b></td>
+									<td><?php echo $ticket['priority']; ?></td>
+								</tr>
+								<tr>
+									<td><b><?php _e('Subject'); ?></b></td>
+									<td><?php echo $ticket['subject']; ?></td>
+								</tr>
+								<!-- <tr>
+									<td><b><?php _e('Department'); ?></b></td>
+									<td>
+										<?php if($ticket['departmentid'] != 0) echo getSingleValue("tickets_departments","name",$ticket['departmentid']);
+										elseif($ticket['departmentid'] == 0) echo '<span class="text-muted">' . __('None') . '</span>';
+										else echo '<span class="text-muted">' . __('None') . '</span>'; ?>
+									</td>
+								</tr> -->
+								<tr>
+									<td><b><?php _e('Created'); ?></b></td>
+									<td><?php echo dateTimeDisplay($ticket['timestamp']); ?></td>
+								</tr>
+								<tr>
+									<td><b><?php _e('Email Address'); ?></b></td>
+									<td><?php echo $ticket['email']; ?></td>
+								</tr>
+								<tr>
+									<td><b><?php _e('Department'); ?></b></td>
+									<td>
+										<?php
+											if($ticket['clientid'] == 0)
+												echo "<span class='text-muted'>".__("None")."</span>";
+											else {
+												if(in_array("manageClient",$perms))
+													echo "<a href='?route=clients/manage&id=".$ticket['clientid']."'>".getSingleValue('clients','name',$ticket['clientid'])."</a>";
+												else echo getSingleValue('clients','name',$ticket['clientid']);
+											}
+										?>
+									</td>
+								</tr>
+								<tr>
+									<td><b><?php _e('Asset'); ?></b></td>
+									<td>
+										<?php
+											if($ticket['typeticket'] == 2){
+													if(in_array("manageAsset",$perms))
+															echo "<a href='?route=inventory/assets/manage&id=$ascok[id]'>".$ascok[machine_id]." ".$ascok[assetname]."</a>";
+													else echo $ascok[machine_id]." ".$ascok[assetname];
+											} else {
+												if($ticket['assetid'] == 0){
+													echo "<span class='text-muted'>".__("None")."</span>";
+												}else {
+													if($_GET[tse] == 1){
+														if(in_array("manageAsset",$perms))
+															echo "<a href='?route=inventory/assets/manage&id=".$ticket['assetid']."'>".getSingleValue('assets','tag',$ticket['assetid']). " " . getSingleValue('assets','name',$ticket['assetid']) . "</a>";
+														else echo getSingleValue('assets','tag',$ticket['assetid']) . " " . getSingleValue('assets','name',$ticket['assetid']);
+													}
+													else {
+														if(in_array("manageVirtual",$perms))
+															echo "<a href='?route=inventory/virtuals/manage&id=".$ticket['assetid']."'>".getSingleValue('virtuals','tag',$ticket['assetid']). " " . getSingleValue('virtuals','name',$ticket['assetid']) . "</a>";
+														else echo getSingleValue('virtuals','tag',$ticket['assetid']) . " " . getSingleValue('virtuals','name',$ticket['assetid']);
+													}	
+												}
+											}
+										?>
+									</td>
+								</tr>
+								<tr>
+									<td><b><?php _e('User'); ?></b></td>
+									<td>
+										<?php
+											if($ticket['typeticket'] == 2){
+												if(in_array("editUser",$perms))
+														echo "<a href='?route=people/users/edit&id=".$ascok['peopleid']."'>".getSingleValue('people','name',$ascok['peopleid'])."</a>";
+													else echo getSingleValue('people','name',$ascok['peopleid']);
+											} else {
+												if($ticket['userid'] == 0)
+													echo "<span class='text-muted'>".__("None")."</span>";
+												else {
+													if(in_array("editUser",$perms))
+														echo "<a href='?route=people/users/edit&id=".$ticket['userid']."'>".getSingleValue('people','name',$ticket['userid'])."</a>";
+													else echo getSingleValue('people','name',$ticket['userid']);
+												}
+											}
+										?>
+									</td>
+								</tr>
+								<tr>
+									<td><b><?php _e('Submitter'); ?></b></td>
+									<td>
+										<?php
+											echo $ticket['reported'];
+										?>
+									</td>
+								</tr>
+								<!-- <tr>
+									<td><b><?php _e('Project'); ?></b></td>
+									<td>
+										<?php
+											if($ticket['projectid'] == 0)
+												echo "<span class='text-muted'>".__("None")."</span>";
+											else {
+												if(in_array("manageProject",$perms))
+													echo "<a href='?route=projects/manage&id=".$ticket['projectid']."'>".getSingleValue('projects','tag',$ticket['projectid']) . " " . getSingleValue('projects','name',$ticket['projectid']) . "</a>";
+												else echo getSingleValue('projects','tag',$ticket['projectid']) . " " . getSingleValue('projects','name',$ticket['projectid']);
+											}
+										?>
+									</td>
+								</tr> -->
+								<!-- <tr>
+									<td><b><?php _e('Phone'); ?></b></td>
+									<td>
+										<?php
+											if($ticket['userid'] == 0)
+												echo "<span class='text-muted'>".__("None")."</span>";
+											else {
+												echo getSingleValue('people','mobile',$ticket['userid']);
+											}
+										?>
+									</td>
+								</tr> -->
+
+								<tr>
+									<td><b><?php _e('Assigned To'); ?></b></td>
+									<td><?php if($ticket['adminid'] == 0) echo "<span class='text-muted'>".__("Nobody")."</span>"; else {
+										$expas = explode(";",$ticket[adminid]);
+										$jmlas = count($expas);
+										for($i=0;$i<$jmlas;$i++){
+											echo "- ".getSingleValue('people','name',$expas[$i])."<br>"; 
+										}
+									} 
+										 ?></td>
+								</tr>
+								<tr>
+									<td>&nbsp;</td>
+									<td><a href='#' onClick='showM("?modal=hisassign/view&id=<?php echo $_GET['id']; ?>");return false' data-toggle='modal' class="btn btn-default btn-sm btn-flat">History Assigned</a></td>
+								</tr>
+								<tr>
+									<td><b><?php _e('Discuss With'); ?></b></td>
+									<td><?php if($ticket['adminid'] == 0) echo "<span class='text-muted'>".__("Nobody")."</span>"; else {
+										$expas = explode(";",$ticket[mentionid]);
+										$jmlass = count($expas);
+										$jmlas = $jmlass-1;
+										for($i=0;$i<$jmlas;$i++){
+											echo "- ".getSingleValue('people','name',$expas[$i])."<br>"; 
+										}
+									} 
+										 ?></td>
+								</tr>
+								<!-- <tr>
+									<td><b><?php _e('CC Recipients'); ?></b></td>
+									<td><?php if($ticket['ccs'] != "") { $ccs = unserialize($ticket['ccs']); foreach($ccs as $cc) echo $cc . " "; } ?></td>
+								</tr> -->
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<?php if(in_array("manageTicketNotes",$perms) && $ticket['notes'] != "") { ?>
+					<div class="box box-primary">
+						<div class="box-header with-border">
+							<h3 class="box-title"><?php _e('Notes'); ?></h3>
+						</div><!-- /.box-header -->
+						<div class="box-body">
+							<?php echo $ticket['notes']; ?>
+						</div>
+					</div>
+				<?php } ?>
+
+			</div>
+		</div>
+
+	</section><!-- /.content -->
+</aside><!-- /.right-side -->
+<script type="text/javascript">
+	function cekemail(val){
+		if($('#idakunmintaticket').val() == 2 && val == 'Finished'){
+			$('#emailinput').show();
+			$('#emailinput').val('');
+		} else {
+			$('#emailinput').hide();
+			$('#emailinput').val(' ');
+		}
+	}
+</script>

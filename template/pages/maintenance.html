@@ -1,0 +1,214 @@
+<link rel="stylesheet" type="text/css" href="vendor/calendars/fullcalendar.min.css">
+<link rel="stylesheet" type="text/css" href="vendor/calendars/daygrid.min.css">
+<link rel="stylesheet" type="text/css" href="vendor/calendars/timegrid.min.css">
+<link rel="stylesheet" type="text/css" href="vendor/calendars/fullcalendar.css">
+
+<!-- Right side column. Contains the navbar and content of the page -->
+<aside class="right-side">
+	<!-- Content Header (Page header) -->
+	<section class="content-header">
+			<h1 class="pull-left"><?php _e('Maintenance'); ?></h1>
+			<div class="pull-right">
+				<?php if(in_array("addmaintenance",$perms)) { ?>
+					<a href="?route=maintenance/listassets" class="btn btn-primary btn-sm btn-flat" style="font-size: 14px;">List Assets</a>
+				<?php } ?>
+        <input type="hidden" name="ticketid" id="ticketid" value="<?=$_GET[ticketid]?>">
+        <input type="hidden" name="datenow" id="datenow" value="<?=date('Y-m-d')?>">
+			</div>
+			<div style="clear:both"></div>
+	</section>
+	<!-- Main content -->
+	<section class="content">
+		<?php if(!empty($statusmessage)): ?>
+				<div class="row"><div class='col-md-12'><div class="alert alert-<?php print $statusmessage["type"]; ?> alert-auto" role="alert"><?php print __($statusmessage["message"]); ?></div></div></div>
+		<?php endif; ?>
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="box box-primary">
+
+                    <div class="box-body">
+                    	<div id='fc-bg-events'></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section><!-- /.content -->
+	<button type="button" style="display: none;" id="modalaction" data-toggle="modal" class="btn btn-primary btn-sm btn-flat">Launch Modal</button>
+	<button type="button" style="display: none;" id="modalaction2" class="btn btn-outline-success block btn-lg" data-toggle="modal" data-target="#large2">Modal Info</button>
+
+</aside><!-- /.right-side -->
+
+
+<script src="vendor/extensions/moment.min.js"></script>
+<script src="vendor/extensions/fullcalendar.min.js"></script>
+<script src="vendor/extensions/daygrid.min.js"></script>
+<script src="vendor/extensions/timegrid.min.js"></script>
+<script src="vendor/extensions/interactions.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script type="text/javascript">
+  
+  var calendarE4 = document.getElementById('fc-bg-events');
+  var fcBgEvents = new FullCalendar.Calendar(calendarE4, {
+    header: {
+      left: 'prev,next today',
+      center: 'title',
+      // right: "dayGridMonth,timeGridWeek,timeGridDay"
+      // right: "dayGridMonth,timeGridWeek"
+      right:""
+    },
+    
+    // dateClick: function(info) {
+    //     // alert('Clicked on: ' + info.dateStr);
+    //     // alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
+    //     // alert('Current view: ' + info.view.type);
+    //     // change the day's background color just for fun
+    //     // info.dayEl.style.backgroundColor = 'red';
+    //     // $('#modalaction2').click();
+    //     $('#modalaction').click();
+    // },
+    eventClick: function(info) {
+      // alert('Event: ' + condate(info.event.start));
+      $('#tglatt').val(condate(info.event.start));
+      $('#ptglreq1').val(condate(info.event.start));
+      $('#ctype').val(info.event.title);
+      $('#checktime').val(startTime(info.event.start));
+      // console.log(info);
+      $('#waktumasuk').val(info.event.extendedProps.starttime);
+      $('#waktupulang').val(info.event.extendedProps.endtime);
+      $('#lwaktumasuk').val(info.event.extendedProps.starttime);
+      $('#lwaktupulang').val(info.event.extendedProps.endtime);
+      $('#pwaktumasuk').val(info.event.extendedProps.starttime);
+      $('#pwaktupulang').val(info.event.extendedProps.endtime);
+      // console.log(info.event.extendedProps.starttime);
+      // $('#tglatt').val(condate(info.event.start));
+      // $('#tglatt').val(condate(info.event.start));
+      // alert(info.event.extendedProps.typedt);
+      if(info.event.extendedProps.typedt == "x"){
+        retrv2(condate(info.event.start));
+      }
+      $('#dtype').val(0).trigger('change');
+      // alert('Coordinates: ' + info.jsEvent.pageX + ',' + info.jsEvent.pageY);
+      // alert('View: ' + info.view.type);
+
+    },
+
+    defaultDate: '<?=date("Y-m-d")?>',
+    navLinks: false, // can click day/week names to navigate views
+    businessHours: false, // display business hours
+    plugins: ['dayGrid', 'timeGrid', "interaction"],
+    editable: true,
+    selectable: true,
+    dayClick: function(date, allDay, jsEvent, view) {
+        console.log(date);
+        $('#fc-bg-events').fullCalendar( 'changeView', 'month');
+        //$('#agenda_calendar').fullCalendar( 'gotoDate', date  );
+        var array = $('#fc-bg-events').fullCalendar('clientEvents', function(event){ 
+            return ( event.start >= date && event.end < date ); // May be change
+        });
+        console.log(array);
+    },
+     
+    select: function(info) {
+        //alert('selected ' + info.startStr + ' to ' + info.endStr);
+        // $('#cobacoba').val(info.startStr);
+        // $('#cici').val(info.startStr);
+        // $('#ltglreq1').val(info.startStr);
+        // $('#ptglreq1').val(info.startStr);
+        const time = info.endStr +' 00:00:00.000';
+        const date = new Date(time);
+        date.setDate(date.getDate()-1);
+
+        var d = new Date(date),
+                  month = '' + (d.getMonth() + 1),
+                  day = '' + d.getDate(),
+                  year = d.getFullYear();
+
+              if (month.length < 2) 
+                  month = '0' + month;
+              if (day.length < 2) 
+                  day = '0' + day;
+
+              var dt= [year, month, day].join('-');
+
+
+        // $('#cobacoba').val(dt);
+        // $('#cici').val(dt);
+        // $('#ltglreq2').val(dt);
+        // $('#modalaction2').click();
+        //checklog(info.startStr);
+        document.getElementById("modalaction").addEventListener("click", pangFunction(info.startStr,$('#ticketid').val()));
+        //$('#modalaction').click();
+        $('#dtype').val(0).trigger('change');
+      },
+    events: function(info, successCallback, failureCallback) {    //get data from db for selected dates
+          var dataArray = {
+            '_token': '{{ $csrf_token }}',
+            'start': info.startStr,
+            'end': info.endStr
+          }
+
+          var d = new Date(info.end),
+                  month = '' + (d.getMonth() + 1),
+                  day = '' + d.getDate(),
+                  year = d.getFullYear();
+
+              if (month.length < 2) 
+                  month = '0' + month;
+              if (day.length < 2) 
+                  day = '0' + day;
+
+              var dt= [year, month, day].join('-');
+
+          var href = "template/pages/attlog.php?end="+dt;
+        //alert(href);
+          $.ajax({
+              type: "POST",
+              dataType: "json",
+              url: href,
+              data: dataArray,
+              success: function (response) {
+                  successCallback(response);
+              },
+              error: function (error) {
+                  failureCallback(error);
+                  popupErrorMessage(error.responseJSON.message);
+              }
+          });
+        },
+        eventTimeFormat: { // like '14:30:00'
+          hour: '2-digit',
+          minute: '2-digit',
+          meridiem: false,
+          hour12: false
+        }
+
+  });
+
+  fcBgEvents.render();
+
+function pangFunction(dated,ticketid) {
+  showM("?modal=maintenance/addCategory&reroute=maintenance&date="+dated+"&ticketid="+ticketid);
+}
+
+if($('#ticketid').val() != ''){
+    Swal.fire({
+      title: 'Maintenance Now?',
+      text: "Date : "+$('#datenow').val(),
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire(
+          'Please Click Date '+$('#datenow').val(),
+          
+        )
+      } else {
+        window.close()
+      }
+    })
+  }
+
+</script>

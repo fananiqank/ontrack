@@ -1,0 +1,76 @@
+
+<div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title"><?php _e('View Barang Masuk'); ?></h4></div>
+<div class="modal-body">
+	<div class="form-group">
+		<?php 
+			foreach($database->query("select a.*,b.name as peoplename from tx_barangmasuk a join people b on a.userid=b.id where a.id = $_GET[id]") as $bm){}
+		?>
+		<input style="height:26px; line-height: 0;" type="button" class="btn btn-info" value="Excel"  onclick="tableToExcel('tablemasuk')"></button>
+		<table class="table" id="tablemasuk">
+			<thead>
+				<tr>
+					<td colspan="2">No Incm: <b><?=$bm[nomasuk]?></b></td>
+					<td>Date : <b><?=$bm[created_date]?></b></td>
+				</tr>
+				<tr>
+					<td colspan="2">Remark : <?=$bm[notes]?></td>
+					<td>User : <b><?=$bm[peoplename]?></b></td>
+				</tr>
+				<tr>
+					<td><b>No</b></td>
+					<td><b>Sparepart</b></td>
+					<td><b>Type</b></td>
+					<td><b>Qty</b></td>
+				</tr>
+			</thead>
+			<tbody>
+				<?php 
+					$no=1;
+					foreach($database->query("select a.*,b.name,case when a.jenisbrg=1 then 'Baru' else 'Bekas' end typebrg from tx_barangmasuk_dtl a join spareparts b on a.sparepartid=b.id where masukid = $_GET[id]") as $id){ ?>
+				<tr>
+					<td><?=$no?></td>
+					<td><?=$id[name]?></td>
+					<td><?=$id[typebrg]?></td>
+					<td><?=$id[qty]?></td>
+				</tr>
+				<?php $no++; } ?>
+				
+			</tbody>
+		</table>	
+	</div>
+	
+	<input type="hidden" name="id" value="<?php echo $category['id']; ?>">
+	<input type="hidden" name="action" value="editAssetCategory">
+    <input type="hidden" name="route" value="<?php echo $_GET['reroute']; ?>">
+	<input type="hidden" name="routeid" value="">
+	<input type="hidden" name="section" value="">
+</div>
+<div class="modal-footer">
+	<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> <?php _e('Back'); ?></button>
+	<!-- <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> <?php _e('Save'); ?></button> -->
+</div>
+
+<script type="text/javascript">
+		$(".colorpicker").colorpicker();
+
+		function cekprefix(){
+	        prefx = $('#prefixcategory').val();
+	        var jumlahString = prefx.length;
+	        if(jumlahString != 4){ alert("Prefix Must be 4 Character!!"); $('#prefixcategory').val('');}
+
+	    }
+
+	    var tableToExcel = (function() {
+		
+		  var uri = 'data:application/vnd.ms-excel;base64,';
+		  var template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>';
+		    var bases = function(s) { return window.btoa(unescape(encodeURIComponent(s))) };
+		    var format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) };
+		  	return function(table, name) {
+		    	if (!table.nodeType) table = document.getElementById(table)
+		    	var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
+		    	window.location.href = uri + bases(format(template, ctx))
+		 	}
+			
+		  })()
+</script>

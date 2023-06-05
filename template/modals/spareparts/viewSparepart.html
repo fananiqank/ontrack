@@ -1,0 +1,68 @@
+<div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title"><?php _e('View Sparepart'); ?></h4></div>
+<?php 
+if($_GET[type] == 2){
+    foreach($database->query("select a.*,d.name as namepeople,c.name as nameaset,b.name as nameuser,c.nodenumber,c.machine_id from maintenance a left join people d on a.userid=d.id left join assets c on a.assetid=c.id left join people b on c.userid=b.id where a.id = $_GET[id]") as $hmmtc){}
+}
+?>
+<div class="modal-body">
+    <div class="form-group">
+       <table class="table">
+           <thead>
+               <tr>
+                   <td colspan="3">No MTC : <b><?=$hmmtc['nomtc']?></b></td>
+                   <td colspan="3">Tgl MTC : <b><?=$hmmtc['tgl_mtc']?></b></td>
+               </tr>
+               <tr>
+                   <td colspan="3">PIC Input : <b><?=$hmmtc['namepeople']?></b></td>
+                   <td colspan="3">Tgl Input : <b><?=$hmmtc['tgl_input']?></b></td>
+               </tr>
+               <tr>
+                    <td colspan="3">Assets : <b><?=$hmmtc['nameaset']." - ".$hmmtc['nameuser']?></b></td>
+                   <td colspan="3">Node : <b><?=$hmmtc['machine_id']." / ".$hmmtc['nodenumber']?></b></td>
+                   
+               </tr>
+               <tr>
+                   <th>No</th>
+                   <th>Jenis Penggantian</th>
+                   <th>Jenis Brg</th>
+                   <th>Sparepart</th>
+                   <th>Qty</th>
+                   <th>Remark</th>
+               </tr>
+           </thead>
+           <tbody>
+            <?php 
+                $no = 1;
+                if($_GET[type]){
+                    $mmtc = $database->query("select a.*,case when jenisbrg=1 then 'Baru' else 'Bekas' end jenisbrg,case when jenisganti=1 then 'Penambahan' when jenisganti=2 then 'Penggantian' else 'Pelepasan' end jenisganti,b.qty,c.name as namepart,d.name as namepeople from maintenance a join maintenance_dtl b on a.id=b.mtcid join spareparts c on b.sparepartid=c.id left join people d on a.userid=d.id where a.id = $_GET[id]");
+                }
+                foreach($mmtc as $mtcdtl){ ?>
+                <tr>
+                   <td><?=$no?></td>
+                   <td><?=$mtcdtl[jenisganti]?></td>
+                   <td><?=$mtcdtl[jenisbrg]?></td>
+                   <td><?=$mtcdtl[namepart]?></td>
+                   <td><?=$mtcdtl[qty]?></td>
+                   <td><?=$mtcdtl[notedmtc]?></td>
+                </tr>
+            <?php $no++; } ?>
+               
+           </tbody>
+       </table>
+    </div>
+
+
+    <input type="hidden" name="action" value="addVirtualAssignment">
+    <input type="hidden" name="virtualid" value="<?php echo $_GET['routeid']; ?>">
+    <input type="hidden" name="route" value="<?php echo $_GET['reroute']; ?>">
+    <input type="hidden" name="routeid" value="<?php echo $_GET['routeid']; ?>">
+    <input type="hidden" name="section" value="">
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> <?php _e('Cancel'); ?></button>
+    <!-- <button type="submit" class="btn btn-primary"><?php _e('Assign'); ?></button> -->
+</div>
+
+<script type="text/javascript">
+		$(".select2").select2();
+</script>

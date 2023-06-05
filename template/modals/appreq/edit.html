@@ -1,0 +1,168 @@
+<div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title"><?php _e('Approve Request'); ?></h4></div>
+<div class="modal-body">
+<?php 
+    $apreq = $database->query("select a.*,b.nogm,b.name as namepeople,c.name as namedept,d.headstatus,d.headpeopleid,d.headappdate,d.headnotes,b.statusid as statusidpeople,b.id as idpeople
+    from people_dtl_request a join people b on a.peopleid=b.id join people_dtl_approve d on a.id=d.peopledtlid 
+    left join clients c on a.clientid=c.id where a.id = '$_GET[id]'");
+    foreach($apreq as $aq){}
+    if($aq[typereq] == 1){$judul = "Permintaan Akun";}
+    else if ($aq[typereq] == 2){$judul = "Izin Akses Data";}
+    else if ($aq[typereq] == 4){$judul = "Penutupan Akun";}
+ ?>
+
+    <div class="form-group">
+        <table class="table">
+            <tr>
+                <td colspan="4"><h4><?=$judul?></h4></td>
+            </tr>
+            <tr>
+                <td>No Peg</td>
+                <td>: <?=$aq['nogm']?></td>
+                <td>Tgl Kebutuhan</td>
+                <td>: <?php if($aq[tgl_butuh2] == ''){echo "Selama Menjabat";}else{echo $aq[tgl_butuh1]."-".$aq[tgl_butuh2];} ?></td>
+            </tr>
+            <tr>
+                <td>Name</td>
+                <td>: <?=$aq['namepeople']?></td>
+                <td>Website Akses</td>
+                <td>: <?=$aq['websiteakses']?></td>
+            </tr>
+            <tr>
+                <td>Dept</td>
+                <td>: <?=$aq['namedept']?></td>
+                <td style="vertical-align: top;">Akun yang diminta</td>
+                <td><?php 
+                    $expakas = explode(';',$aq['akunakses']);
+                    $jml = count($expakas);
+                    $num = 1;
+                                foreach($expakas as $key => $value){
+                                    foreach($database->query("select idakunminta,namaakunminta from akunminta where idakunminta = $value") as $coc){}
+                                    echo "- ".$coc[namaakunminta]."<br>";
+                                }
+                ?></td>
+            </tr>
+            <tr>
+                <td>Jabatan</td>
+                <td>: <?=$aq['title']?></td>
+                <td style="vertical-align: top;">Head Approve</td>
+                <td>Head : <?php echo getSingleValue("people","name",$aq['headpeopleid']); ?> <br>
+                    Status: <b><?=$aq[headstatus]?></b> <br>
+                    Date : <?=$aq[headappdate]?> <br>
+                    Notes : <?=$aq[headnotes]?> 
+                </td>
+            </tr>
+            <tr>
+                <td>Alasan Kebutuhan</td>
+                <td><?=$aq['alasanbutuh']?></td>
+                <td>IT Approve</td>
+                <td>
+                    <select class="form-control select2" id="itstatus" name="itstatus" style="width: 100%;">
+                        <option value="Approve">Approve</option>
+                        <option value="Reject">Reject</option>
+                    </select>
+                </td>
+            </tr>
+            <?php 
+                foreach($database->query("select a.*,b.nogm,b.name as namepeople,c.name as namedept,d.name as locationname from people_dtl_request a join people b on a.peopleid=b.id left join clients c on a.clientid=c.id left join locations d on a.locationid=d.id where a.peopledtlidparent = '$aq[id]'") as $mz){}
+                if($mz['nogm'] != ''){
+            ?>
+            <tr>
+                <td><b>Replacement <br><?php if($mz[typereq]=='4'){echo "(Penutupan Akun)";}?></b></td>
+                <td colspan="3">
+                    <table class="table">
+                        <tr>
+                            <td><b>No Peg</b></td>
+                            <td><b>Nama</b></td>
+                            <td><b>Dept</b></td>
+                            <td><b>Jabatan</b></td>
+                        </tr>
+                        <tr>
+                            <td><?=$mz[nogm]?>
+                                
+                            </td>
+                            <td><?=$mz[namepeople]?></td>
+                            <td><?=$mz[namedept]." - ".$mz[locationname]?></td>
+                            <td><?=$mz[title]?></td>
+                        </tr>
+                    </table>
+                </td>
+
+            </tr>
+            <?php } ?>
+
+    <?php if($aq[typereq] == 2){ ?>
+    <table cellpadding="0" cellspacing="0" style="width:98%;padding-top: 6pt;padding-bottom: 6pt;margin-left: 20px;font-size: 12px;" border="1">
+      <tr>
+          <th colspan="5">Informasi File/Folder</th>
+      </tr>
+      <tr>
+        <th style="width:5%; vertical-align: top;">No</th>
+        <th style="width:25%; vertical-align: top;">File/Folder/Server</th>
+        <th style="width:25%; vertical-align: top;">Lokasi</th>
+        <th style="width:15%; vertical-align: top;">Hak Akses</th>
+        <th style="width:25%; vertical-align: top;">Keterangan</th>
+      </tr>
+      <?php $na = 1; 
+        foreach($database->query("select *,case when hak_akses = 1 then 'Full Akses' when hak_akses=2 then 'Read Only' end hakakses from people_izinakses where peopledtlid = '$_GET[id]'") as $inf){ ?>
+      ?>
+      <tr>
+          <td><?=$na;?></td>
+          <td><?=$inf['filefolder'];?></td>
+          <td><?=$inf['lokasi'];?></td>
+          <td><?=$inf['hakakses'];?></td>
+          <td><?=$inf['remark'];?></td>
+      </tr>
+      <?php } ?>
+    </table>
+    <br>
+    <table cellpadding="0" cellspacing="0" style="width:98%;padding-top: 6pt;padding-bottom: 6pt;margin-left: 20px;font-size: 12px;" border="1">
+      <tr>
+          <th colspan="5">Daftar Anggota Yang Akses</th>
+      </tr>
+      <tr>
+        <th style="width:5%; vertical-align: top;">No</th>
+        <th style="width:40%; vertical-align: top;">User / Node</th>
+        <th style="width:50%; vertical-align: top;">Dept / Team</th>
+        <!-- <th style="width:30%; vertical-align: top;">Permission</th> -->
+      </tr>
+      <?php
+        $na = 1; 
+        foreach($database->query("select b.name as namepeople,c.name as namedept from people_dtl_request a join people b on a.peopleid=b.id left join clients c on a.clientid=c.id where a.id = '$_GET[id]'") as $inu){ ?>
+          <tr>
+              <td><?=$na;?></td>
+              <td><?=$mg['namepeople']?></td>
+              <td><?=$mg['namedept']." - ".$mg['locationname']?></td>
+              <!-- <td><?=$inf['hakakses'];?></td> -->
+          </tr>
+      <?php } ?>
+    </table>
+    <br>
+    <?php } ?>
+            <tr>
+                <td>Notes</td>
+                <td colspan="3"><textarea id="itnotes" name="itnotes" class="form-control"></textarea></td>
+            </tr>
+        </table>
+    </div>
+
+    
+    <input type="hidden" name="action" value="editAppreq">
+    <input type="hidden" name="id" value="<?php echo $aq['id']; ?>">
+    <input type="hidden" name="route" value="<?php echo $_GET['reroute']; ?>">
+    <input type="hidden" name="routeid" value="">
+    <input type="hidden" name="section" value="">
+    <input type="hidden" name="sessionid" value="<?=$liu[id]?>">
+    <input type="hidden" name="statuspeople" value="<?=$aq[statusidpeople]?>">
+    <input type="hidden" name="idpeople" value="<?=$aq[idpeople]?>">
+    <input type="hidden" name="peopledtlid2" id="peopledtlid2" value="<?=$mz[id]?>">
+    <input type="hidden" name="idpeople2" id="idpeople2" value="<?=$mz[peopleid]?>">
+    
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default btn-flat" data-dismiss="modal"><i class="fa fa-times"></i> <?php _e('Cancel'); ?></button>
+    <button type="submit" class="btn btn-success btn-flat"><i class="fa fa-save"></i> <?php _e('Save'); ?></button>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() { $('.summernote-modal').summernote({height: 150}); });
+</script>

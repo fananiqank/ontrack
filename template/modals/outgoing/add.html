@@ -1,0 +1,187 @@
+
+<div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title"><?php _e('New Outgoing'); ?></h4></div>
+<div class="modal-body">
+    <div class="form-group">
+        <label for="name"><?php _e('Gudang'); ?> *</label>
+        <select class="form-control select2" id="gudangid" name="gudangid" style="width: 100%;" onchange="spreset()">
+            <?php foreach($gudangs as $gdg){ ?>
+                <option value="<?=$gdg[id]?>"><?=$gdg[name]?></option>
+            <?php } ?>
+        </select>
+        <input type="hidden" name="userid" id="userid" value="<?=$liu[id]?>">
+    </div>
+    <div class="form-group">
+        <label for="name"><?php _e('Jenis pengeluaran'); ?> *</label>
+        <select class="form-control select2" id="jeniskeluar" name="jeniskeluar" style="width: 100%;">
+                <option value="1">Rusak</option>
+                <option value="2">Penggunaan tanpa ticket</option>
+        </select>
+        <input type="hidden" name="userid" id="userid" value="<?=$liu[id]?>">
+    </div>
+    <div class="form-group" >
+      <label for="color" style="margin-top: 10px;"><?php _e('Remark'); ?> *</label>
+      <textarea class="form-control" id="notes" name="notes"></textarea>
+    </div>
+    <hr>
+    <!-- <div class="form-group">
+        <label for="name"><?php _e('GRIN'); ?> *</label>
+         <select class="form-control select2" id="grin" name="grin" style="width: 100%;" onchange="licensetype(this.value)" >
+            <?php
+            foreach($licenses as $license) {
+                
+                $pakai = $database->count("licenses_assets", [ "licenseid" => $license[id] ] );
+                $tseats = $license[seats]-$pakai;
+                if($license[seats] > $pakai){$sel = "0";}else{$sel = "1";}
+
+                    echo "<option value='".$license['id']."_".$sel."_".$license['typecategory']."'>";
+                            echo $license['tag']." ".$license['name'];
+                            
+                            echo " [" .$tseats."] ";
+                            
+                    echo "</option>";
+            }
+            ?>
+        </select>
+        
+    </div> -->
+    <!-- <div class="form-group">
+        <div class="col-sm-6">
+          <label for="color" ><?php _e('Qty Grin'); ?> *</label>
+          <input type="text" id="grin_qty" name="grin_qty" class="form-control" required>
+        </div>
+        <div class="col-sm-6">
+          <label for="color"><?php _e('Qty Receive'); ?> *</label>
+          <input type="text" id="qty" name="qty" class="form-control" required>
+        </div>
+    </div> -->
+    <div class="form-group row col-sm-6">
+        <label for="color"><?php _e('Type'); ?> *</label>
+        <select class="form-control select2" id="jenisbrg" name="jenisbrg" style="width: 100%;" onchange="spreset()">
+            <option value="1">Baru</option>
+            <option value="2">Bekas</option>
+        </select>
+    </div>
+    <div class="form-group row col-sm-6">
+        <label for="color" style="margin-left: 10%;"><?php _e('Qty'); ?> *</label>
+        <input type="text" name="qtynow" id="qtynow" class="form-control" style="margin-left: 10%;width: 50%;" readonly>
+    </div>
+    <div class="form-group">
+        <label for="name"><?php _e('Sparepart'); ?> *</label>
+         <select class="form-control select2" id="sparepartid" name="sparepartid" style="width: 100%;" onchange="cekqty(this.value,gudangid.value,jenisbrg.value)">
+            <option value='0'>Choose Sparepart</option>
+            <?php
+            foreach($database->query("select * from spareparts where statusid>0") as $sparepart) {
+                echo "<option value='".$sparepart[id]."'>";
+                        echo $sparepart['tag']." - ".$sparepart['name'];
+                echo "</option>";
+            }
+            ?>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="color"><?php _e('Qty Out'); ?> *</label>
+        <input type="text" id="qty" name="qty" class="form-control">
+    </div>
+    <div class="form-group">
+        <a href="javascript:void(0)" class="btn btn-success btn-sm" onclick="saverec()">Add</a>
+    </div>
+    <div class="form-group pre-scrollable" id="listsparepart" style="max-height:200px;">
+        <?php include 'keranjang.php'; ?>
+    </div>
+    
+
+    <input type="hidden" name="action" value="addOutgoing">
+    <input type="hidden" name="route" value="<?php echo $_GET['reroute']; ?>">
+    <input type="hidden" name="routeid" value="">
+    <input type="hidden" name="section" value="">
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> <?php _e('Cancel'); ?></button>
+    <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> <?php _e('Create'); ?></button>
+</div>
+
+
+<script type="text/javascript">
+    $( document ).ready(function() {
+       $(".select2").select2({
+        dropdownParent: $(".modal-header")});
+    });
+
+    function cekqty(id,gudang,jenis){
+        if(id > 0){
+            $.ajax({
+                type: 'GET',
+                url: "template/modals/outgoing/cekqty.php?id="+id+"&gdg="+gudang+"&jns="+jenis,
+                success: function(ui) {
+                    
+                    if(ui <= 0){alert("Stok Kurang!!");
+                    $('#sparepartid').val(0).trigger('change');
+                    $("#qtynow").val('');}
+                    else {$("#qtynow").val(ui);}
+                }
+            });
+        }
+
+    }
+
+    function spreset() {
+        $("#qtynow").val('');
+        $('#sparepartid').val(0).trigger('change');
+    }
+
+    function saverec(){
+       var sparepart = $("#sparepartid").val();
+       var qty = $("#qty").val();
+       var userid = $("#userid").val();
+       var jenisbrg = $("#jenisbrg").val();
+        if(sparepart == 0 || qty == '' || qty == 0){
+            alert("Sparepart / qty harus di isi!!");
+        } else if(qty > $('#qtynow').val()){
+            alert("Qty melebihi stok!");
+            $("#qty").val('');
+            $("#qty").focus();
+        } else {
+            var formData = new FormData();
+          formData.append("sparepart", sparepart);
+          formData.append("qty", qty);
+          formData.append("userid", userid);
+          formData.append("jenisbrg", jenisbrg);
+
+          var xhttp = new XMLHttpRequest();
+
+          // Set POST method and ajax file path
+          xhttp.open("POST", "template/modals/outgoing/proses.php", true);
+
+          // call on request changes state
+          xhttp.onreadystatechange = function() {
+             if (this.readyState == 4 && this.status == 200) {
+
+               var response = this.responseText;
+            
+               if(response > 0){
+                  alert("SUKSES");
+                  $('#listsparepart').load("template/modals/outgoing/keranjang.php?userid="+userid);
+                  $("#sparepartid").val(0).trigger('change');
+                  $("#qty").val('');
+                  $("#qtynow").val('');
+               } else{
+                  alert("GAGAL");
+               }
+             }
+          };
+
+          // Send request with data
+          xhttp.send(formData);
+        }
+    }
+
+    function deleterec(id,userid){
+        $.ajax({
+                type: 'GET',
+                url: "template/modals/outgoing/prosesdel.php?id="+id,
+                success: function(ui) {
+                    $('#listsparepart').load("template/modals/outgoing/keranjang.php?userid="+$("#userid").val());
+                }
+        });
+    }
+</script>

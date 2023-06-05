@@ -1,0 +1,54 @@
+<!-- Date Picker -->
+<link href="template/assets/plugins/datepicker/datepicker3.css" rel="stylesheet" type="text/css" />
+<link href="template/assets/plugins/timepicker/bootstrap-timepicker.min.css" rel="stylesheet" type="text/css" />
+<!-- -->
+<div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title"><?php _e('Extend Date Subscription'); ?></h4></div>
+
+<?php 
+    foreach($database->query("select * from licenses_dtl where id = '$_GET[licensedtlid]'") as $ext){} 
+?>
+
+<div class="modal-body">
+    <div class="form-group">
+        <div class="col-md-6">
+            <label for="startcontract"><?php _e('Start Subscribe Date'); ?></label>
+            <div class="input-group">
+                <input type="date" class="form-control" id="startcontract" name="startcontract">
+                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                <input type="hidden" class="form-control" id="startcontractnow" name="startcontractnow" value="<?=$ext['startsubsdate']?>">
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label for="endcontract"><?php _e('End Subscribe Date'); ?></label>
+            <div class="input-group">
+                <input type="date" class="form-control" id="endcontract" name="endcontract">
+                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                <input type="hidden" class="form-control" id="endcontractnow" name="endcontractnow" value="<?=$ext['endsubsdate']?>">
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-md-12">
+        <label for="licenseid"><?php _e('Notes'); ?></label>
+           <textarea class="form-control" id="editnotes" name="editnotes"></textarea>
+        </div>
+    </div>
+
+    <input type="hidden" name="action" value="extendsubscription">
+    <input type="hidden" name="licenseid" value="<?php echo $_GET['routeid']; ?>">
+    <input type="hidden" name="licensedtlid" value="<?php echo $_GET['licensedtlid']; ?>">
+    <input type="hidden" name="route" value="<?php echo $_GET['reroute']; ?>">
+    <input type="hidden" name="routeid" value="<?php echo $_GET['routeid']; ?>">
+    <input type="hidden" name="balance" value="<?php echo $_GET['bal']; ?>">
+    <input type="hidden" name="section" value="licenseDetail">
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> <?php _e('Cancel'); ?></button>
+    <button type="submit" class="btn btn-primary"><?php _e('Save'); ?></button>
+</div>
+
+<script src="template/assets/plugins/datepicker/bootstrap-datepicker.js" type="text/javascript"></script>
+<script src="template/assets/plugins/timepicker/bootstrap-timepicker.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+		$(".select2").select2();
+</script>

@@ -1,0 +1,32 @@
+<div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title"><?php _e('History Assign '); echo $hisassign['ticket']; ?></h4></div>
+<div class="modal-body">
+
+    <table class="table table-bordered table-hover">
+            <tr>
+                <td class="text-bold"><?php _e('Before'); ?></td>
+                <td class="text-bold"><?php _e('Edit by'); ?></td>
+                <td class="text-bold"><?php _e('Date'); ?></td>
+            </tr>
+        <?php 
+        	foreach($database->query("select * from ticket_assign_history where ticketid='$_GET[id]' order by id DESC") as $ss){ 
+        		
+			?>
+            <tr>
+                <td><?php 
+                    $expb = explode(";",$ss['peopleidbefore']);
+                    $jx = count($expb);
+                    for($i=0;$i<$jx;$i++){
+                        echo "- ".getSingleValue("people","name",$expb[$i]);    
+                    }
+                     ?></td>
+                <td><?php echo getSingleValue("people","name",$ss['peopleidreport']); ?></td>
+            	<td><?php echo $ss[created_date] ?></td>
+            </tr>
+        <?php } ?>
+    </table>
+
+
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> <?php _e('Close'); ?></button>
+</div>

@@ -1,0 +1,47 @@
+<div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button><h4 class="modal-title"><?php _e('Print Label'); ?></h4></div>
+<div class="modal-body">
+    <div class="form-group">
+        <label for="licenseid"><?php _e('Department'); ?></label>
+        <select class="form-control select2" id="clientid" name="clientid" style="width: 100%;" onchange="clienttype(this.value)" >
+            <option value='0'>All</option>
+            <?php
+            foreach($database->query("select * from clients") as $dpt) {
+                    echo "<option value='".$dpt['id']."'>";
+                            echo $dpt['name'];
+                    echo "</option>";
+            }
+            ?>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="licenseid"><?php _e('Location'); ?></label>
+        <select class="form-control select2" id="locationid" name="locationid" style="width: 100%;">
+            <option value='0'>All</option>
+        </select>
+    </div>
+  
+</div>
+<div class="modal-footer">
+    <a href="javascript:void(0)" class="btn btn-primary" onclick="cetaklabel(clientid.value,locationid.value)"><?php _e('Print'); ?></a>
+</div>
+
+<script type="text/javascript">
+        $( document ).ready(function() {
+           $(".select2").select2({
+            dropdownParent: $(".modal-header")});
+        });
+
+        function clienttype(id){
+            $.ajax({
+                type: 'GET',
+                url: "template/modals/assets/location.php?id="+id,
+                success: function(ui) {
+                    $('#locationid').html(ui);
+                    
+                }
+            });
+        }
+        function cetaklabel(client,location) {
+            window.open("?route=pdf&type=assetlabelall&client="+client+"&loc="+location,"_blank");
+        }
+</script>

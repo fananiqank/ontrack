@@ -1,0 +1,544 @@
+<!-- Right side column. Contains the navbar and content of the page -->
+<aside class="right-side">
+	<!-- Content Header (Page header) -->
+	<section class="content-header">
+		<h1><?php _e('Reports'); ?><small> <?php _e('Generare and view reports'); ?></small></h1>
+		<ol class="breadcrumb"><li><a href="?route=dashboard"><i class="fa fa-dashboard"></i> <?php _e('Home'); ?></a></li><li class="active"><?php _e('Reports'); ?></li></ol>
+	</section>
+
+	<!-- Main content -->
+	<section class="content">
+		<?php if(!empty($statusmessage)): ?>
+				<div class="row"><div class='col-md-12'><div class="alert alert-<?php print $statusmessage["type"]; ?> alert-auto" role="alert"><?php print __($statusmessage["message"]); ?></div></div></div>
+		<?php endif; ?>
+		<div class="row">
+			<div class="col-md-6">
+			<!-- 	<div class="box box-primary">
+          			<div class="box-header with-border"><h3 class="box-title"><?php _e('Timesheet'); ?></h3></div>
+					<form role="form" method="get" action="" target="_blank">
+	                    <div class="box-body">
+							<p><?php _e('Generate a report with all the tasks in the selected period.'); ?></p>
+
+							<?php if($isAdmin) { ?>
+								<div class="form-group">
+									<label for="clientid" class="control-label"><?php _e('Departments'); ?></label>
+									<select class="form-control select2 select2-hidden-accessible" id="clientid" name="clientid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<?php foreach ($clients as $client) { echo "<option value='".$client['id']."'>".$client['name']."</option>"; } ?>
+									</select>
+								</div>
+							<?php } ?>
+							<?php if(!$isAdmin) { ?> <input type="hidden" name="clientid" value="<?php echo $liu['clientid']; ?>"> <?php } ?>
+
+							<div class="form-group">
+								<label for="startDate"><?php _e('Start Date'); ?></label>
+								<div class="input-group">
+									<input type="text" class="form-control" id="startDate" name="startDate" required>
+									<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="endDate"><?php _e('End Date'); ?></label>
+								<div class="input-group">
+									<input type="text" class="form-control" id="endDate" name="endDate" required>
+									<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+								</div>
+							</div>
+							<input type="hidden" name="report" value="timesheet">
+							<input type="hidden" name="route" value="reports/view">
+						</div>
+						<div class="box-footer"><button type="submit" class="btn btn-primary btn-flat"><?php _e('Generate'); ?></button></div>
+					</form>
+				</div>
+
+				 <div class="box box-primary">
+          			<div class="box-header with-border"><h3 class="box-title"><?php _e('Timesheet With Summary'); ?></h3></div>
+					<form role="form" method="get" action="" target="_blank">
+	                    <div class="box-body">
+							<p><?php _e('Generate a report with all the tasks in the selected period and a summary of all assets and licenses.'); ?></p>
+							<?php if($isAdmin) { ?>
+								<div class="form-group">
+									<label for="clientid" class="control-label"><?php _e('Departments'); ?></label>
+									<select class="form-control select2 select2-hidden-accessible" id="clientid" name="clientid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<?php foreach ($clients as $client) { echo "<option value='".$client['id']."'>".$client['name']."</option>"; } ?>
+									</select>
+								</div>
+							<?php } ?>
+							<?php if(!$isAdmin) { ?> <input type="hidden" name="clientid" value="<?php echo $liu['clientid']; ?>"> <?php } ?>
+
+							<div class="form-group">
+								<label for="startDate"><?php _e('Start Date'); ?></label>
+								<div class="input-group">
+									<input type="text" class="form-control" id="startDate" name="startDate" required>
+									<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="endDate"><?php _e('End Date'); ?></label>
+								<div class="input-group">
+									<input type="text" class="form-control" id="endDate" name="endDate" required>
+									<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+								</div>
+							</div>
+							<input type="hidden" name="report" value="timesheetSummary">
+							<input type="hidden" name="route" value="reports/view">
+						</div>
+						<div class="box-footer"><button type="submit" class="btn btn-primary btn-flat"><?php _e('Generate'); ?></button></div>
+					</form>
+				</div>  -->
+
+				<div class="box box-primary">
+					<div class="box-header with-border"><h3 class="box-title"><?php _e('Tickets Report'); ?></h3></div><!-- /.box-header -->
+					<form role="form" method="get" action="" target="_blank">
+						<div class="box-body">
+							<p><?php _e('Generate a report with all the tickets opened in the selected period.'); ?></p>
+							<div class="form-group">
+									<label for="clientid" class="control-label"><?php _e('Type Ticket'); ?></label>
+									<select class="form-control select2 select2-hidden-accessible" id="typeticket" name="typeticket" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<option value="1">- <?php _e('IT Support'); ?> -</option>
+										<option value="2">- <?php _e('Form Request'); ?> -</option>
+									<select>
+							</div>
+							<?php if($isAdmin) { ?>
+								<div class="form-group">
+									<label for="clientid" class="control-label"><?php _e('Departments'); ?></label>
+									<select class="form-control select2 select2-hidden-accessible" id="clientid" name="clientid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<?php foreach ($clients as $client) { echo "<option value='".$client['id']."'>".$client['name']."</option>"; } ?>
+									</select>
+								</div>
+							<?php } ?>
+							<?php if(!$isAdmin) { ?> <input type="hidden" name="clientid" value="<?php echo $liu['clientid']; ?>"> <?php } ?>
+							<div class="form-group">
+									<label for="clientid" class="control-label"><?php _e('Assets'); ?></label>
+									<select class="form-control select2 select2-hidden-accessible" id="assetid" name="assetid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<?php foreach ($assets as $asset) { echo "<option value='".$asset['id']."'>".$asset['machine_id']."</option>"; } ?>
+									</select>
+							</div>
+							<div class="form-group">
+									<label for="clientid" class="control-label"><?php _e('User'); ?></label>
+									<select class="form-control select2 select2-hidden-accessible" id="userid" name="userid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<?php foreach ($users as $user) { echo "<option value='".$user['id']."'>".$user['name']."</option>"; } ?>
+									</select>
+							</div>
+							<div class="form-group">
+									<label for="clientid" class="control-label"><?php _e('Assigned IT'); ?></label>
+									<select class="form-control select2 select2-hidden-accessible" id="adminid" name="adminid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<?php foreach ($admins as $admin) { echo "<option value='".$admin['id']."'>".$admin['name']."</option>"; } ?>
+									</select>
+							</div>
+							<div class="form-group">
+									<label for="clientid" class="control-label"><?php _e('Status'); ?></label>
+									<select class="form-control select2 select2-hidden-accessible" id="statusid" name="statusid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<option value="Open"><?php _e('Open'); ?></option>
+					                    <option value="Assigned"><?php _e('Assigned'); ?></option>
+					                    <option value="In Progress"><?php _e('In Progress'); ?></option>
+					                    <option value="Hold"><?php _e('Hold'); ?></option>
+					                    <option value="Closed"><?php _e('Closed'); ?></option>
+					                    <option value="Finished"><?php _e('Finished'); ?></option>
+					                    <option value="Reject"><?php _e('Reject'); ?></option>
+									</select>
+							</div>
+							<div class="form-group">
+									<label for="clientid" class="control-label"><?php _e('Priority'); ?></label>
+									<select class="form-control select2 select2-hidden-accessible" id="priorityid" name="priorityid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<option value="Low"><?php _e('Low'); ?></option>
+                    					<option value="Normal"><?php _e('Normal'); ?></option>
+                    					<option value="High"><?php _e('High'); ?></option>
+                
+									</select>
+							</div>
+							<div class="form-group">
+								<label for="startDate"><?php _e('Start Date'); ?></label>
+								<div class="input-group">
+									<input type="text" class="form-control" id="startDate" name="startDate" required>
+									<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="endDate"><?php _e('End Date'); ?></label>
+								<div class="input-group">
+									<input type="text" class="form-control" id="endDate" name="endDate" required>
+									<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+								</div>
+							</div>
+							<input type="hidden" name="report" value="ticketsReport">
+							<input type="hidden" name="route" value="reports/view">
+						</div>
+						<div class="box-footer"><button type="submit" class="btn btn-primary btn-flat"><?php _e('Generate'); ?></button></div>
+					</form>
+				</div>
+
+				<div class="box box-primary">
+					<div class="box-header with-border"><h3 class="box-title"><?php _e('Form Request'); ?></h3></div><!-- /.box-header -->
+					<form role="form" method="get" action="" target="_blank">
+						<div class="box-body">
+							<p><?php _e('Generate a report with all the Form Request opened in the selected period.'); ?></p>
+							
+							<?php if($isAdmin) { ?>
+								<div class="form-group">
+									<label for="clientid" class="control-label"><?php _e('Departments'); ?></label>
+									<select class="form-control select2 select2-hidden-accessible" id="clientid" name="clientid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<?php foreach ($clients as $client) { echo "<option value='".$client['id']."'>".$client['name']."</option>"; } ?>
+									</select>
+								</div>
+							<?php } ?>
+							<?php if(!$isAdmin) { ?> <input type="hidden" name="clientid" value="<?php echo $liu['clientid']; ?>"> <?php } ?>
+							<div class="form-group">
+									<label for="clientid" class="control-label"><?php _e('Assets'); ?></label>
+									<select class="form-control select2 select2-hidden-accessible" id="assetid" name="assetid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<?php foreach ($assets as $asset) { echo "<option value='".$asset['id']."'>".$asset['machine_id']."</option>"; } ?>
+									</select>
+							</div>
+							<div class="form-group">
+									<label for="clientid" class="control-label"><?php _e('User'); ?></label>
+									<select class="form-control select2 select2-hidden-accessible" id="userid" name="userid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<?php foreach ($users as $user) { echo "<option value='".$user['id']."'>".$user['name']."</option>"; } ?>
+									</select>
+							</div>
+							
+							<div class="form-group">
+								<label for="startDate"><?php _e('Start Date'); ?></label>
+								<div class="input-group">
+									<input type="text" class="form-control" id="startDate" name="startDate" required>
+									<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="endDate"><?php _e('End Date'); ?></label>
+								<div class="input-group">
+									<input type="text" class="form-control" id="endDate" name="endDate" required>
+									<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+								</div>
+							</div>
+							<input type="hidden" name="report" value="formrequestReport">
+							<input type="hidden" name="route" value="reports/view">
+						</div>
+						<div class="box-footer"><button type="submit" class="btn btn-primary btn-flat"><?php _e('Generate'); ?></button></div>
+					</form>
+				</div>
+                <div class="box box-primary">
+          			<div class="box-header with-border"><h3 class="box-title"><?php _e('Maintenance'); ?></h3></div>
+					<form role="form" method="get" action="" target="_blank">
+	                    <div class="box-body">
+							<p><?php _e('Generate a report with a Summary of Maintenance.'); ?></p>
+							<div class="form-group">
+								<label for="startDate"><?php _e('Start Date'); ?></label>
+								<div class="input-group">
+									<input type="text" class="form-control" id="startDate" name="startDate" required>
+									<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="endDate"><?php _e('End Date'); ?></label>
+								<div class="input-group">
+									<input type="text" class="form-control" id="endDate" name="endDate" required>
+									<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+								</div>
+							</div>
+							<input type="hidden" name="report" value="summarymaintenance">
+							<input type="hidden" name="route" value="reports/view">
+						</div>
+						<div class="box-footer"><button type="submit" class="btn btn-primary btn-flat"><?php _e('Generate'); ?></button></div>
+					</form>
+				</div>
+				<div class="box box-primary">
+          			<div class="box-header with-border"><h3 class="box-title"><?php _e('Timesheet'); ?></h3></div>
+					<form role="form" method="get" action="" target="_blank">
+	                    <div class="box-body">
+							<p><?php _e('Generate a report with all the tasks in the selected period.'); ?></p>
+
+							<?php if($isAdmin) { ?>
+								<div class="form-group" style="display: none;">
+									<label for="clientid" class="control-label"><?php _e('Departments'); ?></label>
+									<select class="form-control select2 select2-hidden-accessible" id="clientid" name="clientid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<?php foreach ($clients as $client) { echo "<option value='".$client['id']."'>".$client['name']."</option>"; } ?>
+									</select>
+								</div>
+							<?php } ?>
+							<?php if(!$isAdmin) { ?> <input type="hidden" name="clientid" value="<?php echo $liu['clientid']; ?>"> <?php } ?>
+							<div class="form-group">
+									<label for="clientid" class="control-label"><?php _e('Staff'); ?></label>
+									<select class="form-control select2 select2-hidden-accessible" id="peopleid" name="peopleid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<?php foreach ($database->query("select * from people where type='admin'") as $stf) { echo "<option value='".$stf['id']."'>".$stf['name']."</option>"; } ?>
+									</select>
+							</div>
+							<div class="form-group">
+								<label for="startDate"><?php _e('Start Date'); ?></label>
+								<div class="input-group">
+									<input type="text" class="form-control" id="startDate" name="startDate" required>
+									<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="endDate"><?php _e('End Date'); ?></label>
+								<div class="input-group">
+									<input type="text" class="form-control" id="endDate" name="endDate" required>
+									<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+								</div>
+							</div>
+							<input type="hidden" name="report" value="timesheetlog">
+							<input type="hidden" name="route" value="reports/view">
+						</div>
+						<div class="box-footer"><button type="submit" class="btn btn-primary btn-flat"><?php _e('Generate'); ?></button></div>
+					</form>
+				</div>
+			</div>
+
+			<div class="col-md-6">
+				<div class="box box-primary">
+          			<div class="box-header with-border"><h3 class="box-title"><?php _e('Asset Summary'); ?></h3></div><!-- /.box-header -->
+					<form role="form" method="get" action="" target="_blank">
+	                    <div class="box-body">
+							<p><?php _e('Generate a report with a Summary of All Assets.'); ?></p>
+							<?php if($isAdmin) { ?>
+								<div class="form-group">
+									<label for="clientid" class="control-label">Departments</label>
+									<select class="form-control select2 select2-hidden-accessible" id="clientid" name="clientid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<?php foreach ($clients as $client) { echo "<option value='".$client['id']."'>".$client['name']."</option>"; } ?>
+									</select>
+								</div>
+							<?php } ?>
+							<?php if(!$isAdmin) { ?> <input type="hidden" name="clientid" value="<?php echo $liu['clientid']; ?>"> <?php } ?>
+							<div class="form-group">
+									<label for="clientid" class="control-label">Type</label>
+									<select class="form-control select2 select2-hidden-accessible" id="typeasset" name="typeasset" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<option value="1"><?php _e('Owned'); ?> -</option>
+										<option value="2"><?php _e('Rent'); ?> -</option>
+									</select>
+							</div>
+							<div class="form-group">
+									<label for="clientid" class="control-label">Category</label>
+									<select class="form-control select2 select2-hidden-accessible" id="categoryid" name="categoryid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<?php foreach ($assetcategoriess as $ascat) { echo "<option value='".$ascat['id']."'>".$ascat['name']."</option>"; } ?>
+									</select>
+							</div>
+							<div class="form-group">
+									<label for="clientid" class="control-label">Status</label>
+									<select class="form-control select2 select2-hidden-accessible" id="statusid" name="statusid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<?php foreach ($labels as $label) { echo "<option value='".$label['id']."'>".$label['name']."</option>"; } ?>
+									</select>
+							</div>
+							
+							<input type="hidden" name="report" value="summaryasset">
+							<input type="hidden" name="route" value="reports/view">
+						</div>
+						<div class="box-footer"><button type="submit" class="btn btn-primary btn-flat"><?php _e('Generate'); ?></button></div>
+					</form>
+					
+				</div>
+			</div>
+
+			<div class="col-md-6">
+				<div class="box box-primary">
+          			<div class="box-header with-border"><h3 class="box-title"><?php _e('Licenses Summary'); ?></h3></div>
+					<form role="form" method="get" action="" target="_blank">
+	                    <div class="box-body">
+							<p><?php _e('Generate a report with a Summary of All License.'); ?></p>
+							<?php if($isAdmin) { ?>
+								<!-- <div class="form-group">
+									<label for="clientid" class="control-label">Departments</label>
+									<select class="form-control select2 select2-hidden-accessible" id="clientid" name="clientid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<?php foreach ($clients as $client) { echo "<option value='".$client['id']."'>".$client['name']."</option>"; } ?>
+									</select>
+								</div> -->
+							<?php } ?>
+							<?php if(!$isAdmin) { ?> <!-- <input type="hidden" name="clientid" value="<?php echo $liu['clientid']; ?>"> --> <?php } ?>
+							<div class="form-group">
+									<label for="clientid" class="control-label">Type Category</label>
+									<select class="form-control select2 select2-hidden-accessible" id="tcategoryid" name="tcategoryid" onchange="depart(this.value)" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<option value="Perpetual" <?php if($_GET[ltc] == 'Perpetual'){ echo "selected"; }?>>Perpetual</option>
+										<option value="Subscription" <?php if($_GET[ltc] == 'Subscription'){ echo "selected"; }?>>Subscription</option>
+										<option value="Free" <?php if($_GET[ltc] == 'Free'){ echo "selected"; }?>>Free</option>
+									</select>
+							</div>
+							<div class="form-group">
+									<label for="clientid" class="control-label">Category</label>
+									<select class="form-control select2 select2-hidden-accessible" id="categoryid" name="categoryid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<?php 
+											if($_GET['ltc'] && $_GET['ltc'] != '0'){
+												$where = "where typecategory = '$_GET[ltc]'";
+											} else {
+												$where = "";
+											}
+											$licensecats = $database->query("select * from licensecategories $where");
+											foreach ($licensecats as $licat) { echo "<option value='".$licat['id']."'>".$licat['name']." - ".$licat['typecategory']."</option>"; } ?>
+									</select>
+							</div>
+							<div class="form-group">
+									<label for="clientid" class="control-label">Status</label>
+									<select class="form-control select2 select2-hidden-accessible" id="statusid" name="statusid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<?php foreach ($labels as $label) { echo "<option value='".$label['id']."'>".$label['name']."</option>"; } ?>
+									</select>
+							</div>
+							
+							<!-- <div class="form-group">
+									<label for="clientid" class="control-label">Type Summary</label>
+									<select class="form-control select2 select2-hidden-accessible" id="tsum" name="tsum" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<option value="1">License Used</option>
+										<option value="2">Installed</option>
+										<option value="3">Downgraded</option>
+										<option value="4">No License</option>
+									</select>
+							</div> -->
+							<div class="form-group">
+									<label for="namelic" class="control-label">Name</label>
+									<select class="form-control select2" id="licensename" name="licensename[]" style="width: 100%;" multiple>
+										<?php $selname =$database->query("select name from licenses group by name");
+											  foreach ($selname as $lname) {
+											echo "<option value='".$lname['name']."'>".$lname['name']."</option>";
+										} ?>
+									</select>
+							</div>
+							
+							<input type="hidden" name="report" value="summarylicense">
+							<input type="hidden" name="route" value="reports/view">
+						</div>
+						<div class="box-footer"><button type="submit" class="btn btn-primary btn-flat"><?php _e('Generate'); ?></button></div>
+					</form>
+				</div>
+
+				<div class="box box-primary">
+          			<div class="box-header with-border"><h3 class="box-title"><?php _e('Virtual Machine Summary'); ?></h3></div>
+					<form role="form" method="get" action="" target="_blank">
+	                    <div class="box-body">
+							<p><?php _e('Generate a report with a Summary of All Virtual Machine.'); ?></p>
+							
+							<!-- <div class="form-group">
+									<label for="clientid" class="control-label">Category</label>
+									<select class="form-control select2 select2-hidden-accessible" id="categoryid" name="categoryid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<?php foreach ($licensecategoriess as $licat) { echo "<option value='".$licat['id']."'>".$licat['name']."</option>"; } ?>
+									</select>
+							</div> -->
+							<div class="form-group">
+								<label for="clientid" class="control-label">Status</label>
+								<select class="form-control select2 select2-hidden-accessible" id="statusid" name="statusid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+									<option value="0">- <?php _e('ALL'); ?> -</option>
+									<?php foreach ($labels as $label) { echo "<option value='".$label['id']."'>".$label['name']."</option>"; } ?>
+								</select>
+							</div>
+							
+							<input type="hidden" name="report" value="summaryvirtual">
+							<input type="hidden" name="route" value="reports/view">
+						</div>
+						<div class="box-footer"><button type="submit" class="btn btn-primary btn-flat"><?php _e('Generate'); ?></button></div>
+					</form>
+				</div>
+				<div class="box box-primary">
+          			<div class="box-header with-border"><h3 class="box-title"><?php _e('Spareparts Stock'); ?></h3><a href="?route=reports/viewminimumstock" class="btn btn-danger btn-flat" style="float:right;" target="_blank"><?php _e('View Minimum Stock'); ?></a></div>
+					<form role="form" method="get" action="" target="_blank">
+	                    <div class="box-body">
+							<p><?php _e('Generate a report with a Summary of Sparepart Stock.'); ?></p>
+							
+							<!-- <div class="form-group">
+								<label for="clientid" class="control-label">Status</label>
+								<select class="form-control select2 select2-hidden-accessible" id="statusid" name="statusid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+									<option value="0">- <?php _e('ALL'); ?> -</option>
+									<?php foreach ($labels as $label) { echo "<option value='".$label['id']."'>".$label['name']."</option>"; } ?>
+								</select>
+							</div> -->
+							<div class="form-group">
+								<label for="clientid" class="control-label">Gudang</label>
+								<select class="form-control select2 select2-hidden-accessible" id="gudangid" name="gudangid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+									<option value="0">ALL</option>
+									<?php foreach ($database->query("select * from gudang where statusid = 1") as $gdg) { echo "<option value='".$gdg['id']."'>".$gdg['name']."</option>"; } ?>
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="clientid" class="control-label">Jenis Spareparts</label>
+								<select class="form-control select2 select2-hidden-accessible" id="jenisbrg" name="jenisbrg" style="width: 100%;" tabindex="-1" aria-hidden="true">
+									<option value='0'>ALL</option>
+									<option value='1'>Baru</option>
+									<option value='2'>Bekas</option>
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="startDate"><?php _e('Start Date'); ?></label>
+								<div class="input-group">
+									<input type="text" class="form-control" id="startDate" name="startDate" required>
+									<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+								</div>
+							</div>
+							<div class="form-group">
+								<label for="endDate"><?php _e('End Date'); ?></label>
+								<div class="input-group">
+									<input type="text" class="form-control" id="endDate" name="endDate" required>
+									<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+								</div>
+							</div>
+							<input type="hidden" name="report" value="summarysparepartstock">
+							<input type="hidden" name="route" value="reports/view">
+						</div>
+						<div class="box-footer"><button type="submit" class="btn btn-primary btn-flat"><?php _e('Generate'); ?></button>
+						</div>
+					</form>
+				</div>
+				<!-- <div class="box box-primary">
+					<div class="box-header with-border"><h3 class="box-title"><?php _e('User Summary'); ?></h3></div>
+					<form role="form" method="get" action="" target="_blank">
+						<div class="box-body">
+							<p><?php _e('Generate a report with a summary of all assets assigned to a user.'); ?></p>
+							<?php if($isAdmin) { ?>
+								<div class="form-group">
+									<label for="userid" class="control-label">User</label>
+									<select class="form-control select2 select2-hidden-accessible" id="userid" name="userid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+										<option value="0">- <?php _e('ALL'); ?> -</option>
+										<?php foreach ($users as $user) { echo "<option value='".$user['id']."'>".$user['name']."</option>"; } ?>
+									</select>
+								</div>
+							<?php } ?>
+							<?php if(!$isAdmin) { ?> <input type="hidden" name="userid" value="<?php echo $liu['id']; ?>"> <?php } ?>
+
+							<input type="hidden" name="report" value="userSummary">
+							<input type="hidden" name="route" value="reports/view">
+						</div>
+						<div class="box-footer"><button type="submit" class="btn btn-primary btn-flat"><?php _e('Generate'); ?></button></div>
+					</form>
+				</div>
+				<div class="box box-primary">
+					<div class="box-header with-border"><h3 class="box-title"><?php _e('Other Reports'); ?></h3></div><!-- /.box-header -->
+						<div class="box-body">
+							<p><a href="?route=reports/assets" class="btn btn-default btn-flat"><?php _e('Assets (Detailed List)'); ?></a></p>
+							<p><a href="?route=reports/licenses" class="btn btn-default btn-flat"><?php _e('Licenses (Detailed List)'); ?></a></p>
+
+							<p></p>
+						</div>
+
+				</div>
+
+			</div>
+		</div>
+
+
+
+	</section><!-- /.content -->
+</aside><!-- /.right-side -->
+<script type="text/javascript">
+	
+	function depart(_this) {
+		location.href= "?route=reports&ltc="+_this;
+    }
+
+</script>

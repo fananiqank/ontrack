@@ -1,0 +1,70 @@
+<?php 
+    foreach($database->query("select * from licenses_dtl where id = $_GET[licensedtlid]") as $lcsnow){}
+    $lcsdtls = $database->query("select a.*,b.name from licenses_dtl_history a join people b on a.userid=b.id where licensedtlid = $_GET[licensedtlid]");
+
+?>
+<div class="modal-body">
+    <input style="height:26px; line-height: 0;" type="button" class="btn btn-info" value="Excel"  onclick="tableToExcel('coki')"></button>
+    <div class="form-group pre-scrollable">
+
+        <table id="coki" class="table table-striped table-hover table-bordered">
+            <thead style=" position: sticky; top: 0; z-index: 1;background-color: white;color: black">
+                <tr>
+                    <th colspan="6">
+                        <h5 class="modal-title">Subscription Date Now : <b><?=$lcsnow['startsubsdate']?></b> - <b><?=$lcsnow['endsubsdate']?></b></h5>
+                    </th>
+                </tr>
+                <tr>
+                    <th>No</th>
+                    <th>Start Subs Date</th>
+                    <th>End Subs Date</th>
+                    <th>Edited Date</th>
+                    <th>Edited By</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php 
+                    $no= 1;
+                    
+                    foreach($lcsdtls as $lcsdtl){
+                     
+                        echo "<tr>";
+                        echo "<td>$no</td>";
+                        echo "<td>".$lcsdtl['startdate']."</td>";
+                        echo "<td>".$lcsdtl['enddate']."</td>";
+                        echo "<td>".$lcsdtl['created_date']."</td>";
+                        echo "<td>".$lcsdtl['name']."</td>";
+                        echo "</tr>";
+                $no++;} ?>
+                
+            </tbody>
+        </table>
+    </div>
+
+    <input type="hidden" name="action" value="addLicenseAssignment">
+    <input type="hidden" name="licenseid" value="<?php echo $_GET['routeid']; ?>">
+    <input type="hidden" name="route" value="<?php echo $_GET['reroute']; ?>">
+    <input type="hidden" name="routeid" value="<?php echo $_GET['routeid']; ?>">
+    <input type="hidden" name="section" value="">
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default input-sm" data-dismiss="modal" aria-label="Close">Close</button>
+</div>
+
+<script type="text/javascript">
+		$(".select2").select2();
+
+        var tableToExcel = (function() {
+        
+        var uri = 'data:application/vnd.ms-excel;base64,';
+        var template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>';
+        var bases = function(s) { return window.btoa(unescape(encodeURIComponent(s))) };
+        var format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) };
+        return function(table, name) {
+        if (!table.nodeType) table = document.getElementById(table)
+        var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
+        window.location.href = uri + bases(format(template, ctx))
+        }
+
+        })()
+</script>

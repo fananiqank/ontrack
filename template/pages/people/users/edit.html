@@ -1,0 +1,414 @@
+<aside class="right-side">
+	<!-- Content Header (Page header) -->
+	<section class="content-header">
+		<h1><a class="btn btn-warning btn-sm btn-flat" href="?route=people/users"><?php _e('Back'); ?></a>  &emsp; <?php echo $user['name']; ?><small> <?php _e('Edit user account'); ?></small></h1>
+		<ol class="breadcrumb"><li><a href="?route=dashboard"><i class="fa fa-dashboard"></i> <?php _e('Home'); ?></a></li><li><?php _e('People'); ?></li><li class="active"><?php _e('Users'); ?></li></ol>
+	</section>
+
+	<!-- Main content -->
+	<section class="content">
+		<?php if(!empty($statusmessage)): ?>
+				<div class="row"><div class='col-md-12'><div class="alert alert-<?php print $statusmessage["type"]; ?> alert-auto" role="alert"><?php print __($statusmessage["message"]); ?></div></div></div>
+		<?php endif; ?>
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="nav-tabs-custom">
+            		<ul class="nav nav-tabs">
+
+              			<li <?php if ($section == "") echo 'class="active"'; ?> ><a href="?route=people/users/edit&id=<?php echo $user['id']; ?>&section="><?php _e('Edit'); ?></a></li>
+
+			  			<li <?php if ($section == "detailAkun")  echo 'class="active"'; ?> ><a href="?route=people/users/edit&id=<?php echo $user['id']; ?>&section=detailAkun"><?php _e('Request List'); ?></a></li>
+			  			
+			  		
+			  		<div class="btn-group pull-right" style="padding:6px;">
+              			<!-- <a data-toggle='tooltip' title='<?php _e('New Issue'); ?>' class="btn btn-success btn-sm btn-flat" href="#" onClick='showM("?modal=assets/assignTS&reroute=inventory/assets/manage&routeid=<?php echo $asset['id']; ?>&clientid=<?php echo $asset['clientid']; ?>&assetid=<?php echo $asset['id']; ?>&section=");return false'><?php _e('Assign TS'); ?></a> -->
+              		</div>
+              		</ul>
+			  	</div>
+			  	<div class="tab-content">
+				  	<div class="tab-pane <?php if ($section == "") echo 'active'; ?>" id="tab-edit">
+						<div class="box box-primary">
+		                    <div class="box-body">
+								<div class="row">
+									<div class="col-md-12">
+										<form role="form" method="post">
+
+											<div class="row">
+												<div class="col-md-6">
+													<?php if($isAdmin) { ?>
+														<div class="form-group">
+													        <label for="clientid"><?php _e('Departements'); ?> *</label>
+													        <select class="form-control select2" id="clientid" name="clientid" style="width: 100%;" required>
+
+													            <?php 
+													            	if($user['locationid'] == ''){echo "<option value=''>None</option>";}
+													            	$lclient= $database->query("select a.id,b.id as locationid,a.name,b.name as locationname from clients a left join locations b on a.id=b.clientid");
+													            	foreach ($lclient as $lc) { ?>
+													                
+													                <option value='<?php echo $lc['locationid']."_".$lc[id]; ?>' <?php if($lc['locationid'] == $user['locationid']) echo "selected"; else echo "";?> ><?php echo $lc['name']." - ".$lc['locationname']; ?></option>
+													            <?php } ?>
+													        </select>
+													    </div>
+													<?php } ?>
+													<?php if(!$isAdmin) { ?><input type="hidden" name="clientid" value="<?php echo $user['clientid']; ?>"><?php } ?>
+
+													<div class="row">
+														<div class="col-md-6">
+															<div class="form-group">
+																<label for="roleid"><?php _e('Role'); ?> *</label>
+																<select class="form-control select2 select2-hidden-accessible" id="roleid" name="roleid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+																	<?php foreach ($roles as $role) { ?>
+																		<option value='<?php echo $role['id']; ?>' <?php if($role['id'] == $user['roleid']) echo "selected"; ?> ><?php echo $role['name']; ?></option>
+																	<?php } ?>
+																</select>
+															</div>
+														</div>
+														<div class="col-md-6">
+															<div class="form-group">
+																<label for="email"><?php _e('No Pegawai'); ?> *</label>
+																<input type="text" class="form-control" id="nogm" name="nogm" value="<?php echo $user['nogm']; ?>" required>
+															</div>
+														</div>
+													</div>
+
+													<div class="form-group">
+														<label for="name"><?php _e('Name'); ?> *</label>
+														<input type="text" class="form-control" id="name" name="name" value="<?php echo $user['name']; ?>" required>
+													</div>
+
+													<div class="row">
+														<div class="col-md-6">
+															<div class="form-group">
+																<label for="email"><?php _e('Email Address'); ?> *</label>
+																<input type="email" class="form-control" id="email" name="email" value="<?php echo $user['email']; ?>" >
+															</div>
+														</div>
+
+														<div class="col-md-6">
+															<div class="form-group">
+																<label for="password"><?php _e('Password'); ?></label>
+																<div class="input-group">
+																	<input type="text" class="form-control passwordinput" id="password" name="password" placeholder="<?php _e('Enter or generate new password to change.'); ?>">
+																	<span class="input-group-btn"><button type="button" class="btn btn-default btn-flat getNewPass" data-toggle='tooltip' title='<?php _e('Generate password'); ?>'><i class="fa fa-refresh"></i></button></span>
+																</div>
+															</div>
+														</div>
+													</div>
+
+													<?php if(getConfigValue("ldap_enable") == "true") { ?>
+												        <div class="form-group">
+												            <label for="ldap_user"><?php _e('LDAP/AD Username'); ?></label>
+												            <input type="text" class="form-control" id="ldap_user" name="ldap_user" autocomplete="off" value="<?php echo $user['ldap_user']; ?>">
+												        </div>
+												    <?php } else { ?>
+												        <input type="hidden" name="ldap_user" value="<?php echo $user['ldap_user']; ?>">
+												    <?php } ?>
+
+
+													<div class="form-group">
+														<label for="lang"><?php _e('Language'); ?></label>
+														<select class="form-control select2 select2-hidden-accessible" id="lang" name="lang" style="width: 100%;" tabindex="-1" aria-hidden="true">
+															<?php foreach ($languages as $language) { ?>
+																<option <?php if($user['lang'] == $language['code']) echo 'selected'; ?> value="<?php echo $language['code']; ?>"><?php echo $language['name']; ?></option>
+															<?php } ?>
+														</select>
+													</div>
+
+													<div class="form-group">
+														<label for="lang"><?php _e('Status'); ?></label>
+														<select class="form-control select2 select2-hidden-accessible" id="statusid" name="statusid" style="width: 100%;" tabindex="-1" aria-hidden="true">
+															<option <?php if($user['statusid'] == 'Active') echo 'selected'; ?> value="Active">Active</option>
+															<option <?php if($user['statusid'] == 'Nonactive') echo 'selected'; ?> value="Nonactive">Non Active</option>
+															<option <?php if($user['statusid'] == 'Request') echo 'selected'; ?> value="Request">Request</option>
+														</select>
+													</div>
+
+													<!-- <div class="form-group">
+														<label for="lang"><?php _e('Website Akses'); ?></label>
+														<textarea class="form-control" id="websiteakses" name="websiteakses" ><?=$user[websiteakses]?></textarea>
+													</div> -->
+
+
+												</div>
+
+												<div class="col-md-6">
+													<div class="form-group">
+														<label for="mobile"><?php _e('Mobile Number'); ?></label>
+														<input type="text" class="form-control" id="mobile" name="mobile" value="<?php echo $user['mobile']; ?>">
+													</div>
+
+													<div class="form-group">
+														<label for="title"><?php _e('Job Title'); ?></label>
+														<input type="text" class="form-control" id="title" value="<?php echo $user['title']; ?>" autocomplete="off" name="title">
+													</div>
+
+
+
+
+													<div class="form-group">
+														<label for="theme"><?php _e('Theme'); ?></label>
+														<select class="form-control select2 select2-hidden-accessible" id="theme" name="theme" style="width: 100%;" tabindex="-1" aria-hidden="true">
+															<option value="skin-blue" <?php if($user['theme']=="skin-blue") echo "selected"; ?>><?php _e('Blue'); ?></option>
+															<option value="skin-black" <?php if($user['theme']=="skin-black") echo "selected"; ?>><?php _e('Black'); ?></option>
+															<option value="skin-purple" <?php if($user['theme']=="skin-purple") echo "selected"; ?>><?php _e('Purple'); ?></option>
+															<option value="skin-green" <?php if($user['theme']=="skin-green") echo "selected"; ?>><?php _e('Green'); ?></option>
+															<option value="skin-red" <?php if($user['theme']=="skin-red") echo "selected"; ?>><?php _e('Red'); ?></option>
+															<option value="skin-yellow" <?php if($user['theme']=="skin-yellow") echo "selected"; ?>><?php _e('Yellow'); ?></option>
+															<option value="skin-blue-light" <?php if($user['theme']=="skin-blue-light") echo "selected"; ?>><?php _e('Blue Light'); ?></option>
+															<option value="skin-black-light" <?php if($user['theme']=="skin-black-light") echo "selected"; ?>><?php _e('Black Light'); ?></option>
+															<option value="skin-purple-light" <?php if($user['theme']=="skin-purple-light") echo "selected"; ?>><?php _e('Purple Light'); ?></option>
+															<option value="skin-green-light" <?php if($user['theme']=="skin-green-light") echo "selected"; ?>><?php _e('Green Light'); ?></option>
+															<option value="skin-red-light" <?php if($user['theme']=="skin-red-light") echo "selected"; ?>><?php _e('Red Light'); ?></option>
+															<option value="skin-yellow-light" <?php if($user['theme']=="skin-yellow-light") echo "selected"; ?>><?php _e('Yellow Light'); ?></option>
+														</select>
+													</div>
+
+													<div class="form-group">
+														<label for="sidebar"><?php _e('Sidebar'); ?></label>
+														<select class="form-control select2 select2-hidden-accessible" id="sidebar" name="sidebar" style="width: 100%;" tabindex="-1" aria-hidden="true">
+															<option value="opened" <?php if($user['sidebar']=="opened") echo "selected"; ?>><?php _e('Opened'); ?></option>
+															<option value="collapsed" <?php if($user['sidebar']=="collapsed") echo "selected"; ?>><?php _e('Collapsed'); ?></option>
+														</select>
+													</div>
+
+													<div class="form-group">
+														<label for="layout"><?php _e('Layout'); ?></label>
+														<select class="form-control select2 select2-hidden-accessible" id="layout" name="layout" style="width: 100%;" tabindex="-1" aria-hidden="true">
+															<option value="" <?php if($user['layout']== "") echo "selected"; ?>><?php _e('Standard'); ?></option>
+															<option value="fixed" <?php if($user['layout']=="fixed") echo "selected"; ?>><?php _e('Fixed'); ?></option>
+															<option value="layout-boxed" <?php if($user['layout']=="layout-boxed") echo "selected"; ?>><?php _e('Boxed'); ?></option>
+														</select>
+													</div>
+													<div class="form-group">
+														<label for="lang"><?php _e('Type User'); ?></label>
+														<select class="form-control select2 select2-hidden-accessible" id="approval_type" name="approval_type" style="width: 100%;" tabindex="-1" aria-hidden="true">
+															<option <?php if($user['approval_type'] == '0') echo 'selected'; ?> value="0">User</option>
+															<option <?php if($user['approval_type'] == '1') echo 'selected'; ?> value="1">Head Approve</option>
+															<!-- <option <?php if($user['approval_type'] == '2') echo 'selected'; ?> value="2">IT Approve</option> -->
+														</select>
+													</div>
+													<div class="row">
+														<!-- <div class="col-md-6">
+															<div class="form-group">
+																<label for="tglbutuh"><?php _e('Tgl Kebutuhan'); if($user['tgl_butuh2'] == '0000-00-00'){echo " (Selama Menjabat)";}?></label>
+																<input type="date" class="form-control" id="tgl_butuh1" name="tgl_butuh1" value="<?php echo $user['tgl_butuh1']; ?>" required>
+															</div>
+														</div>
+														<div class="col-md-1">
+															<label for="tglbutuh">&nbsp;</label>
+															<div class="input-group">
+																s/d
+															</div>
+														</div>
+														<div class="col-md-5">
+															<div class="form-group">
+																<label for="tglbutuh">&nbsp;</label>
+																<div class="input-group">
+																	<input type="date" class="form-control" id="tgl_butuh2" name="tgl_butuh2" value="<?php echo $user['tgl_butuh2']; ?>">
+																	
+																</div>
+															</div>
+														</div> -->
+													</div>
+													<div class="row">
+														<!-- <label for="lang"><?php _e('Akun Akses'); ?></label>
+														<div class="col-md-12">
+														<?php 
+															$expakas = explode(';',$user['akunakses']);
+															$jml = count($expakas);
+															$num = 1;
+															foreach($expakas as $key => $value){
+																foreach($database->query("select idakunminta,namaakunminta from akunminta where idakunminta = $value") as $coc){}
+														?>
+																<div class="col-md-4">
+																<input type="checkbox" name="akunakses<?=$value?>" id="akunakses<?=$value?>" value="<?=$coc['idakunminta']?>" checked>
+																<?=$coc['namaakunminta']?>
+																</div> 
+																
+														<?php 
+															$vm[].=$value;
+															}
+															$ck = implode(',',$vm);
+															foreach($database->query("select idakunminta,namaakunminta from akunminta where idakunminta not in ($ck)") as $coc2){
+														?>
+															   <div class="col-md-4">
+															   <input type="checkbox" name="akunakses<?=$coc2[idakunminta]?>" id="akunakses<?=$coc2[idakunminta]?>" value="<?=$coc2['idakunminta']?>">
+																<?=$coc2['namaakunminta']?>
+															   </div>
+														<?php 
+															}
+														?>	
+														<input type="hidden" name="jmlam" id="jmlam" value="<?=$jam['jmlminta']?>">
+														</div> -->
+													</div>
+												</div>
+											</div>
+											<!-- <div class="form-group">
+												<label for="lang"><?php _e('File Upload'); ?></label>&emsp;
+												<a class="btn btn-default btn-sm btn-flat" href="#" onClick='showM("?modal=files/upload&reroute=people/users/edit&routeid=<?=$_GET[id]?>&peopleid=<?php echo $user['id']; ?>");return false'><i class="fa fa-upload fa-fw"></i><?php _e('Upload'); ?></a>&ensp;
+
+												<?php if(empty($files)) { ?>
+												    <div class="alert alert-info">
+													  	<i class="icon fa fa-info"></i> <?php _e('No files have been uploaded yet!'); ?>
+													</div>
+											   <?php } ?>
+
+											   <ul class="todo-list list-inline" id="fileslist">
+												   <?php foreach($files as $file) { ?>
+													   <li id="" style="width:260px;margin:10px;padding:8px;height:60px;">
+															 <div class="row">
+																 <div class="col-xs-2" style="text-align:center;vertical-align:middle;height:60px;">
+																	 <i class="fa fa-<?php echo File::icon($file['file']); ?>" style="font-size:36px;padding-top:3px;"></i>
+																 </div>
+																 <div class="col-xs-10">
+																	 <?php echo ttruncat($file['name'],30) . "<br><small>" . ttruncat($file['file'],35) . "</small>"; ?>
+																	 <div class="pull-right">
+																		 <?php if(in_array("viewFiles",$perms)) { ?><a href="#" onClick='showM("?modal=files/view&reroute=inventory/assets/manage&routeid=<?php echo $asset['id']; ?>&id=<?php echo $file['id']; ?>&section=files");return false' class='btn-right text-dark'><i class='fa fa-eye'></i></a>&nbsp;<?php } ?>
+																		 <?php if(in_array("downloadFile",$perms)) { ?><a href="<?php echo "?qa=download&id=" . $file['id']; ?>" class='btn-right text-dark'><i class='fa fa-download'></i></a>&nbsp;<?php } ?>
+																		 <?php if(in_array("deleteFile",$perms)) { ?><a href="#" onClick='showM("?modal=files/delete&reroute=people/users/edit&routeid=<?php echo $user['id']; ?>&id=<?php echo $file['id']; ?>");return false' class='btn-right text-red'><i class='fa fa-trash-o'></i></a><?php } ?>
+																	 </div>
+																 </div>
+															 </div>
+													   </li>
+												   <?php } ?>
+											   </ul>
+											</div> -->
+											<div class="form-group">
+												<label for="notes"><?php _e('Notes'); ?></label>
+												<textarea class="form-control summernote" id="notes" name="notes"><?=$user['notes']; ?></textarea>
+											</div>
+
+											<input type="hidden" name="action" value="editUser">
+											<input type="hidden" name="route" value="people/users/edit">
+											<input type="hidden" name="routeid" value="<?php echo $user['id']; ?>">
+											<input type="hidden" name="id" value="<?php echo $user['id']; ?>">
+
+											<div class="form-group">
+												<button type="submit" class="btn btn-success btn-flat"><i class="fa fa-save"></i> <?php _e('Save'); ?></button>
+											</div>
+
+										</form><!-- /.form -->
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				
+				<?php if(in_array("detailAkun",$perms)) { ?>
+				<div class="tab-pane <?php if ($section == "detailAkun") echo 'active'; ?>" id="tab-detailAkun">
+					<div class="table-responsive" align="center">
+		    			<u><b><?php echo $user['nogm']." - ".$user['name']; ?></b></u>
+		    		
+		    			<!-- <a href="?route=inventory/licenses/create&id=<?=$license['id']?>" class="btn btn-info btn-sm" style="float:right"><?php _e('Create New Detail License'); ?></a> -->
+						<table class="table table-striped table-hover table-bordered">
+			              <thead>
+			                  <tr>
+			                      <th><?php _e('Date Input'); ?></th>
+								  <th><?php _e('Type'); ?></th>
+			                      <th><?php _e('Akun Akses'); ?></th>
+								  <th><?php _e('Tgl Butuh'); ?></th>
+								  <th><?php _e('Notes'); ?></th>
+								  <th><?php _e('Approve'); ?></th>
+								  <th width="5%"><?php _e('Doc'); ?></th>
+								  <th class="text-right"></th>
+			                  </tr>
+			              </thead>
+			              <tbody>
+										<?php
+										if($_GET[dtl]){	$detil = "and a.id=$_GET[dtl]";} else {$detil = "";}
+
+										$details = $database->query("select a.*, case when typereq = 1 then 'Permintaan Akun' when typereq = 2 then 'Izin Akses Data' when typereq = 3 then 'Peminjaman Laptop' when typereq = 4 then 'Penutupan Akun' end as typer,b.headstatus,b.itstatus from people_dtl_request a left join people_dtl_approve b on a.id=b.peopledtlid where peopleid = '$_GET[id]' $detil");
+										foreach ($details as $det) { 
+										if($det[typereq] == 1){$ctk = "newrequestacc";}else if($det[typereq] == 2){$ctk = "newrequestaci";}else if($det[typereq] == 4){$ctk = "newrequestacp";}
+
+										echo "<tr>";
+											echo "<td>".date('Y-m-d',strtotime($det[created_date]))."</td>";
+											echo "<td>".$det[typer]."</td>";
+											echo "<td>"; 																		$expakas = explode(';',$det['akunakses']);
+												$jml = count($expakas);
+												$num = 1;
+															foreach($expakas as $key => $value){
+																foreach($database->query("select idakunminta,namaakunminta from akunminta where idakunminta = $value") as $coc){}
+																echo "- ".$coc[namaakunminta]."<br>";
+															}
+											echo "</td>";
+											echo "<td>";
+												if($det[tgl_butuh2] == ''){
+													echo "Selama Menjabat";
+												} else {
+													echo "Tgl ".$det[tgl_butuh1]." s/d ".$det[tgl_butuh2];
+												}
+											echo "</td>";
+											echo "<td>";
+												if($det[websiteakses] != ''){ echo "Website Akses :".$det['websiteakses'];}
+												else {echo "";}
+											echo "</td>";
+											echo "<td> Head : "; if($det[headstatus] != ''){echo $det[headstatus];}else{echo "Request";} 
+											echo "<br> IT &emsp;&ensp;: ";if($det[itstatus] != ''){echo $det[itstatus];}else{echo "Request";}
+											echo "</td>";
+											echo "<td>";
+										?>
+
+										<?php foreach($database->query("select *,substring(file,-4) as ext from files where peopleid = '$det[id]'")as $file) { ?>
+										<ul class="todo-list list-inline" id="fileslist">
+									   <li id="" style="width:200px;margin:10px;padding:5px;height:60px;background-color:#DCDCDC">
+											 <div class="row">
+												 <div class="col-xs-1" style="text-align:center;vertical-align:middle;height:50px;" style=">
+													 <i class="fa fa-<?php echo File::icon($file['file']); ?>" style="font-size:12px;padding-top:2px;"></i>
+												 </div>
+												 <div class="col-xs-10" >
+													 <?php echo ttruncat($file['name'],30) . "<br><small>" . ttruncat($file['ext'],35) . "</small>"; ?>
+													 <div class="pull-right">
+														 <?php if(in_array("viewFiles",$perms)) { ?>
+														 <a href="#" onClick='showM("?modal=files/view&reroute=people/users/edit&routeid=<?php echo $det['id']; ?>&id=<?php echo $file['id']; ?>");return false' class='btn-right text-dark'><i class='fa fa-eye'></i></a>&nbsp;<?php } ?>
+														 <?php if(in_array("downloadFile",$perms)) { ?><a href="<?php echo "?qa=download&id=" . $file['id']; ?>" class='btn-right text-dark'><i class='fa fa-download'></i></a>&nbsp;<?php } ?>
+														 <?php if(in_array("deleteFile",$perms)) { ?><a href="#" onClick='showM("?modal=files/delete&reroute=people/users/edit&routeid=<?php echo $user['id']; ?>&id=<?php echo $file['id']; ?>&section=detailAkun");return false' class='btn-right text-red'><i class='fa fa-trash-o'></i></a><?php } ?>
+													 </div>
+												 </div>
+											 </div>
+									   </li>
+									  </ul>
+								   <?php } 
+										echo "</td>"; 
+										echo "<td><div class='btn-group pull-right'>"; ?>
+											<a class="btn btn-default btn-sm btn-flat" href="#" onClick='showM("?modal=files/upload&reroute=people/users/edit&routeid=<?php echo $user['id']; ?>&clientid=<?php echo $user['clientid']; ?>&peopleid=<?php echo $det['id']; ?>&section=detaulAkun");return false'><i class="fa fa-upload fa-fw"></i><?php _e('Upload'); ?></a>&ensp;
+											<a href='http://192.168.31.25/eraticket/cetak.php?page=<?=$ctk?>&id=<?=$det[id]?>' class='btn btn-flat btn-warning btn-sm' title='View Form' target='_blank'><i class='fa fa-eye'></i></a>&ensp;
+											<?php if($det[itstatus] == 'Approve'){ ?>
+											<a href='#' onClick='showM("?modal=users/assignTSuser&reroute=people/users/edit&routeid=<?php echo $user['id']; ?>&clientid=<?php echo $user['clientid']; ?>&peopleid=<?php echo $det['id']; ?>&typereq=<?php echo $det['typereq']; ?>&section=");return false' data-toggle='modal' class='btn btn-flat btn-success btn-sm'><i class='fa fa-share'></i></a>
+											<?php } ?>
+											<!-- <a href='#' onClick='showM("?modal=people/deletedetail&reroute=people/users/edit&routeid=<?php echo $det['id']; ?>&clientid=<?php echo $user['clientid']; ?>&peopleid=<?php echo $det['id']; ?>");return false' data-toggle='modal' class='btn btn-flat btn-danger btn-sm'><i class='fa fa-trash-o'></i></a> -->
+									<?php
+										echo "</div></td>";
+									echo "</tr>";
+									}
+								?>
+									</tbody>
+								</table>
+					</div>
+				</div>
+				<?php } ?>
+				</div>
+			</div>
+		</div>
+
+
+	</section><!-- /.content -->
+</aside><!-- /.right-side -->
+
+<script type="text/javascript">
+
+    function generatePassword() {
+        var length = <?php echo getConfigValue("password_generator_length"); ?>,
+        charset = "abcdefghijklnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
+        retVal = "";
+        for (var i = 0, n = charset.length; i < length; ++i) {
+            retVal += charset.charAt(Math.floor(Math.random() * n));
+        }
+        return retVal;
+    }
+
+    $(".getNewPass").click(function(){
+        $(".passwordinput").val(generatePassword());
+    });
+
+</script>

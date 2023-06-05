@@ -1,0 +1,1576 @@
+<!-- Right side column. Contains the navbar and content of the page -->
+<style type="text/css">
+@media print
+{    
+  .no-print, .no-print *
+  {
+      display: none !important;
+  }
+}
+</style>
+<aside class="right-side">
+
+	<!-- Main content -->
+	<section class="content">
+        <section class="invoice">
+
+
+	<?php if($_GET['report'] == "timesheet") { ?>
+
+		<div class="row"><div class="col-xs-12"><h2 class="page-header"><i class="fa fa-globe"></i> <?php echo getConfigValue("company_name"); ?><small class="pull-right"><?php _e('Date:'); ?> <?php echo dateDisplay(date('Y-m-d')); ?></small></h2></div></div>
+		<div class="row">
+			<div class="col-xs-6"><h4><b><?php _e('TIMESHEET'); ?></b></h4></div>
+			<div class="col-xs-6 text-right">
+				<?php if(isset($_GET['clientid']) && $_GET['clientid'] != 0) echo "<h4>".__("Client")." <b>".getSingleValue("clients","name",$_GET['clientid'])."</b></h4>"; ?>
+				<?php if(isset($_GET['startDate']) && isset($_GET['endDate'])) echo "<h4>".__("Date range")." <b>".$_GET['startDate']." - ".$_GET['endDate']."</b></h4>"; ?>
+			</div>
+		</div>
+		<br>
+
+		<div class="row">
+
+			<div class="col-xs-12 table-responsive">
+				<table class="table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th colspan="7"><span class="lead"><b><?php _e('TIME LOG'); ?></b></span></th>
+						</tr>
+						<tr>
+							<th><?php _e('Departments'); ?></th>
+							<th><?php _e('Asset'); ?></th>
+							<th><?php _e('Project'); ?></th>
+							<th><?php _e('Staff'); ?></th>
+							<th><?php _e('Date & Time'); ?></th>
+							<th><?php _e('Duration'); ?></th>
+							<th><?php _e('Tagged Items'); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php $totalsecs = 0; $totalissues = 0; $totaltickets = 0; ?>
+						<?php foreach($timelog as $item) { ?>
+							<?php
+							  $tag_issues = unserialize($item['issues']);
+							  $tag_tickets = unserialize($item['tickets']);
+
+							  if(empty($tag_issues)) $tag_issues = [];
+							  if(empty($tag_tickets)) $tag_tickets = [];
+							?>
+						<tr>
+
+							<td><?php echo getSingleValue("clients","name",$item['clientid']); ?></td>
+							<td><?php echo getSingleValue("assets","tag",$item['assetid']); ?><br><?php echo getSingleValue("assets","name",$item['assetid']); ?></td>
+							<td><?php echo getSingleValue("projects","tag",$item['projectid']); ?><br><?php echo getSingleValue("projects","name",$item['projectid']); ?></td>
+							<td><?php echo getSingleValue("people","name",$item['staffid']); ?></td>
+							<td><?php echo dateDisplay($item['date']); ?> <?php echo $item['start']; ?> <i class='fa fa-long-arrow-right'></i> <?php echo $item['end']; ?></td>
+							<td>
+								<?php
+									$currentduration = duration($item['date'], $item['start'], $item['end']);
+									$totalsecs = $totalsecs + $currentduration;
+								 ?>
+								<?php echo secondsToTime($currentduration); ?>
+							</td>
+
+							<td>
+								<?php foreach($tag_issues as $tag_issue) { $totalissues++; ?>
+								  <i class='fa fa-tasks fa-fw'></i> <?php echo getSingleValue("issues", "name", $tag_issue); ?><br>
+								<?php } ?>
+								<?php foreach($tag_tickets as $tag_ticket) { $totaltickets++; ?>
+								  <i class='fa fa-ticket fa-fw'></i> <?php echo getSingleValue("tickets", "ticket", $tag_ticket); ?> <?php echo getSingleValue("tickets", "subject", $tag_ticket); ?><br>
+								<?php } ?>
+							</td>
+
+							<td><?php echo $item['description']; ?></td>
+
+						</tr>
+						<?php } ?>
+					</tbody>
+					<tfoot>
+						<tr>
+							<th colspan="5"><?php _e('Totals'); ?></th>
+							<th><?php echo secondsToTime($totalsecs); ?> </th>
+							<th><?php echo $totalissues; ?> <?php _e('Issues'); ?>, <?php echo $totaltickets; ?> <?php _e('Tickets'); ?></th>
+						</tr>
+					</tfoot>
+				</table>
+		  </div>
+
+			<div class="col-xs-12 table-responsive">
+				<table class="table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th colspan="8"><span class="lead"><b><?php _e('ISSUES'); ?></b></span></th>
+						</tr>
+						<tr>
+							<th><?php _e('ID'); ?></th>
+							<th><?php _e('Departments'); ?></th>
+							<th><?php _e('Asset'); ?></th>
+							<th><?php _e('Project'); ?></th>
+							<th><?php _e('Owner'); ?></th>
+							<th><?php _e('Name'); ?></th>
+							<th><?php _e('Status'); ?></th>
+							<th><?php _e('Date Added'); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach($issues as $task) { ?>
+						<tr>
+							<td><?php echo $task['id']; ?></td>
+							<td><?php echo getSingleValue("clients","name",$task['clientid']); ?></td>
+							<td><?php echo getSingleValue("assets","tag",$task['assetid']); ?><br><?php echo getSingleValue("assets","name",$task['assetid']); ?></td>
+							<td><?php echo getSingleValue("projects","tag",$task['projectid']); ?><br><?php echo getSingleValue("projects","name",$task['projectid']); ?></td>
+							<td><?php echo getSingleValue("people","name",$task['adminid']); ?></td>
+							<td><?php echo $task['name']; ?></td>
+							<td><?php echo $task['status']; ?></td>
+							<td><?php echo dateTimeDisplay($task['dateadded']); ?></td>
+						</tr>
+						<?php } ?>
+					</tbody>
+				</table>
+		  </div>
+		  <div class="col-xs-12 table-responsive">
+			  <table class="table table-striped table-bordered">
+				  <thead>
+					  <tr>
+						  <th colspan="8"><span class="lead"><b><?php _e('TICKETS'); ?></b></span></th>
+					  </tr>
+					  <tr>
+						  <th><?php _e('Ticket'); ?></th>
+						  <th><?php _e('Departments'); ?></th>
+						  <th><?php _e('Asset'); ?></th>
+						  <th><?php _e('Project'); ?></th>
+						  <th><?php _e('Owner'); ?></th>
+						  <th><?php _e('Subject'); ?></th>
+						  <th><?php _e('Status'); ?></th>
+						  <th><?php _e('Date Added'); ?></th>
+					  </tr>
+				  </thead>
+				  <tbody>
+					  <?php foreach($tickets as $ticket) { ?>
+					  <tr>
+						  <td>#<?php echo $ticket['ticket']; ?></td>
+
+						  <td><?php echo getSingleValue("clients","name",$ticket['clientid']); ?></td>
+						  <td><?php echo getSingleValue("assets","tag",$ticket['assetid']); ?><br><?php echo getSingleValue("assets","name",$ticket['assetid']); ?></td>
+						  <td><?php echo getSingleValue("projects","tag",$ticket['projectid']); ?><br><?php echo getSingleValue("projects","name",$ticket['projectid']); ?></td>
+						  <td><?php echo getSingleValue("people","name",$ticket['adminid']); ?></td>
+						  <td><?php echo $ticket['subject']; ?></td>
+						  <td><?php echo $ticket['status']; ?></td>
+						  <td><?php echo dateTimeDisplay($ticket['timestamp']); ?></td>
+					  </tr>
+					  <?php } ?>
+				  </tbody>
+			  </table>
+		</div>
+		</div>
+
+		<!-- this row will not appear when printing -->
+		<div class="row no-print">
+          <div class="col-xs-12">
+            <button onClick="window.print();" class="btn btn-default pull-right"><i class="fa fa-print"></i> <?php _e('Print'); ?></button>
+          </div>
+        </div>
+
+
+	<?php } elseif($_GET['report'] == "ticketsReport") { ?>
+
+
+		<div class="row"><div class="col-xs-12"><h2 class="page-header"><i class="fa fa-globe"></i> <?php echo getConfigValue("company_name"); ?><small class="pull-right"><?php _e('Date:'); ?> <?php echo dateDisplay(date('Y-m-d')); ?></small></h2></div></div>
+		<div class="row">
+			<div class="col-xs-6"><h4><b><?php _e('TICKETS REPORT'); ?></b></h4></div>
+			<div class="col-xs-6 text-right">
+				<?php if(isset($_GET['clientid']) && $_GET['clientid'] != 0) echo "<h4>".__("Client")." <b>".getSingleValue("clients","name",$_GET['clientid'])."</b></h4>"; ?>
+				<?php if(isset($_GET['startDate']) && isset($_GET['endDate'])) echo "<h4>".__("Date range")." <b>".$_GET['startDate']." - ".$_GET['endDate']."</b></h4>"; ?>
+			</div>
+		</div>
+		<br>
+
+		<div class="row">
+
+
+
+		  <div class="col-xs-12 table-responsive">
+		  	<input style="height:26px; line-height: 0;" type="button" class="btn btn-info" value="Excel"  onclick="tableToExcel('tableticket')"></button>
+			  <table class="table table-striped table-bordered" id="tableticket">
+				  <thead>
+					  <tr>
+						  <th colspan="9"><span class="lead"><b><?php _e('TICKETS'); ?></b></span></th>
+					  </tr>
+					  <tr>
+					  	<th><?php _e('No'); ?></th>
+						  <th><?php _e('Ticket'); ?></th>
+						  <th><?php _e('Departments'); ?></th>
+						  <th><?php _e('Asset'); ?></th>
+						  <th><?php _e('Type'); ?></th>
+						  <th><?php _e('Assigned'); ?></th>
+						  <th><?php _e('Subject'); ?></th>
+						  <th><?php _e('User'); ?></th>
+						  <th><?php _e('Status'); ?></th>
+						  <th><?php _e('Priority'); ?></th>
+						  <th><?php _e('Date Added'); ?></th>
+						  <th><?php _e('Handling (Hour)'); ?></th>
+					  </tr>
+				  </thead>
+				  <tbody>
+					  <?php $no=1; 
+					  			$ni=1;
+					  			foreach($tickets as $ticket) { ?>
+					  <tr>
+					  	<td><?php echo $no; ?></td>
+						  <td>#<?php echo $ticket['ticket']; ?></td>
+						  <td><?php echo getSingleValue("clients","name",$ticket['clientid']); ?></td>
+						  <td><?php echo getSingleValue("assets","tag",$ticket['assetid']); ?><br><?php echo getSingleValue("assets","name",$ticket['assetid']); ?></td>
+						  <td><?php if($ticket[typeticket] == 3) {echo "Form Request";} else { echo "ITSupport";}?></td>
+						  <td><?php if($ticket['adminid'] != 0) { 
+													$expp = explode(";",$ticket['adminid']);
+													$jmlp = count($expp);
+													
+													for($i=0;$i<$jmlp;$i++){
+												?>
+													<!-- <img src="<?php echo getGravatar(getSingleValue("people","email",$expp['$i']),"24"); ?>" class="img-circle" style="max-height:24px;"/> -->
+													<?php echo "- ".getSingleValue("people","name",$expp[$i])."<br>"; ?>
+												<?php } } else  echo "<span class='text-muted'>".__("Nobody")."</span>"; ?></td>
+						  <td><?php echo $ticket['subject']; ?></td>
+						  <td><?php echo getSingleValue("people","name",$ticket['userid']); ?></td>
+						  <td><?php echo $ticket['status']; ?></td>
+						  <td><?php echo $ticket['priority']; ?></td>
+						  <td><?php echo dateTimeDisplay($ticket['timestamp']); ?></td>
+						  <td><?php 
+						  	foreach($database->query("select SUM(CAST(COALESCE(SUBSTRING_INDEX(TIMEDIFF(closed_date, created_date),':',1),0) AS SIGNED)) as slaholdend from ticket_holdtime where ticketid = '$ticket[id]'") as $hd){} 
+
+												if($ticket[status] == 'Closed' || $ticket[status] == 'Finished'){
+													$ticketsla = $ticket[slafinished] - $hd[slaholdend];
+												} else {
+													if($ticket[approvedate] == ''){
+														$ticketsla = $ticket[sla];
+													} else {
+														$ticketsla = $ticket[slamod];
+													}
+												}
+												 
+												if ($ticketsla > $slt[sla]){echo "<font style='font-size:14px;color:#FF0000'><b> $ticketsla</b></font>";
+												} else if ($ticketsla == $slt[sla]){echo "<font style='font-size:14px;color:#0AB84D'><b>$ticketsla</b></font>";
+												} else if ($ticketsla < $slt[sla]){echo "<font style='font-size:14px;color:#0A98B8'><b>$ticketsla</b></font>";
+												}
+								?></td>
+					  </tr>
+					  <?php 
+					  	$jml +=$ni;
+					  	$no++; 
+
+					  } ?>
+				  </tbody>
+				  <tfoot>
+					  <tr>
+						  <th colspan="9"><?php echo $jml; ?> <?php _e('Tickets'); ?></th>
+					  </tr>
+				  </tfoot>
+
+			  </table>
+		</div>
+
+
+
+					<div class="col-xs-12 table-responsive">
+						<table class="table table-striped table-bordered">
+							<thead>
+								<tr>
+									<th colspan="8"><span class="lead"><b><?php _e('BY DEPARTMENT'); ?></b></span></th>
+								</tr>
+								<tr>
+									<th><?php _e('Departments'); ?></th>
+									<th><?php _e('Tickets'); ?></th>
+
+								</tr>
+							</thead>
+							<tbody>
+								<?php 
+									
+			if($_GET[typeticket] > 0){ $typeticket="and typeticket=$_GET[typeticket]"; } else {$typeticket="";}
+			if($_GET[adminid] > 0){ $adminid="and adminid like '%".$_GET[adminid]."%'"; } else {$adminid="";}
+			if($_GET[assetid] > 0){ $assetid="and assetid=$_GET[assetid]"; } else {$assetid="";}
+			if($_GET[userid] > 0){ $userid="and userid=$_GET[userid]"; } else {$userid="";}
+			if($_GET[statusid] > 0){ $statusid="and statusid=$_GET[statusid]"; } else {$statusid="";}
+			if($_GET[priorityid] > 0){ $priorityid="and priorityid=$_GET[priorityid]"; } else {$priorityid="";}
+
+									foreach($departments as $department) {
+										
+											foreach($database->query("select count(id) jmlid from tickets where timestamp between '$_GET[startDate]' and '$_GET[endDate]' and clientid=$department[id] $typeticket $assetid $adminid $userid $statusid $priorityid") as $totaldep){}
+											if($totaldep[jmlid] != "0"){
+									?>
+									<tr>
+										<td><?php echo $department['name']; ?></td>
+
+										<td><?php echo $totaldep[jmlid]; ?></td>
+
+									</tr>
+								<?php }
+										} 
+								?>
+							</tbody>
+						</table>
+				  </div>
+
+		</div>
+
+		<!-- this row will not appear when printing -->
+		<div class="row no-print">
+          <div class="col-xs-12">
+            <button onClick="window.print();" class="btn btn-default pull-right"><i class="fa fa-print"></i> <?php _e('Print'); ?></button>
+          </div>
+        </div>
+
+  <?php } elseif($_GET['report'] == "formrequestReport") { ?>
+
+
+		<div class="row"><div class="col-xs-12"><h2 class="page-header"><i class="fa fa-globe"></i> <?php echo getConfigValue("company_name"); ?><small class="pull-right"><?php _e('Date:'); ?> <?php echo dateDisplay(date('Y-m-d')); ?></small></h2></div></div>
+		<div class="row">
+			<div class="col-xs-6"><h4><b><?php _e('FORM REQUEST REPORT'); ?></b></h4></div>
+			<div class="col-xs-6 text-right">
+				<?php if(isset($_GET['clientid']) && $_GET['clientid'] != 0) echo "<h4>".__("Client")." <b>".getSingleValue("clients","name",$_GET['clientid'])."</b></h4>"; ?>
+				<?php if(isset($_GET['startDate']) && isset($_GET['endDate'])) echo "<h4>".__("Date range")." <b>".$_GET['startDate']." - ".$_GET['endDate']."</b></h4>"; ?>
+			</div>
+		</div>
+		<br>
+
+		<div class="row">
+
+
+
+		  <div class="col-xs-12 table-responsive">
+		  	<input style="height:26px; line-height: 0;" type="button" class="btn btn-info" value="Excel"  onclick="tableToExcel('tableticket')"></button>
+			  <table class="table table-striped table-bordered" id="tableticket">
+				  <thead>
+					  <tr>
+						  <th colspan="9"><span class="lead"><b><?php _e('Form Request'); ?></b></span></th>
+					  </tr>
+					  <tr>
+					  	<th><?php _e('No'); ?></th>
+						  <th><?php _e('type'); ?></th>
+						  <th><?php _e('Name'); ?></th>
+						  <th><?php _e('Dept'); ?></th>
+						  <th><?php _e('Jabatan'); ?></th>
+						  <th><?php _e('Act'); ?></th>
+					  </tr>
+				  </thead>
+				  <tbody>
+					  <?php $no=1; 
+					  			$ni=1;
+					  			$reqs = $database->query("select a.name as namepeople, c.`name` as namedept, b.title,b.mobile,b.statusid,b.id as iddtl,case when typereq = 1 then 'Permintaan Akun' when typereq = 2 then 'Izin Akses Data' when typereq = 4 then 'Penutupan Akun' 
+	end as typereqshow,case when typereq = 1 then 'newrequestacc' when typereq = 2 then 'newrequestaci' when typereq = 4 then 'newrequestacp' end as downtype,typereq,a.nogm,concat(b.id,'_',b.typereq) as gab,headstatus,itstatus,concat (c.`name`,' - ',e.name) as locationname
+from people a join people_dtl_request b on a.id=b.peopleid join clients c on b.clientid=c.id join people_dtl_approve d on b.id=d.peopledtlid left join locations e on a.locationid = e.id ORDER BY b.id DESC");
+					  			foreach($reqs as $req) { ?>
+					  <tr>
+					  	<td><?php echo $no; ?></td>
+						  <td><?php echo $req['typereqshow']; ?></td>
+						  <td><?php echo $req['namepeople']; ?></td>
+						  <td><?php echo $req['namedept'].'-'.$req['locationname']; ?></td>
+						  <td><?php echo $req['title'] ?></td>
+						  <td><a href='javascript:void(0)' class='label label-primary' onClick='window.open("http://192.168.31.25/eraticket/cetak.php?page=<?=$req[downtype]?>&id=<?=$req[iddtl]?>")'  style='cursor:pointer'><i class='fa fa-download'>&nbsp;Form</i></a></td>
+						 
+					  </tr>
+					  <?php 
+					  	$jml +=$ni;
+					  	$no++; 
+
+					  } ?>
+				  </tbody>
+				  <tfoot>
+					  <tr>
+						  <th colspan="9"><?php echo $jml; ?> <?php _e('Form Request'); ?></th>
+					  </tr>
+				  </tfoot>
+
+			  </table>
+		</div>
+
+
+
+					<!-- <div class="col-xs-12 table-responsive">
+						<table class="table table-striped table-bordered">
+							<thead>
+								<tr>
+									<th colspan="8"><span class="lead"><b><?php _e('BY DEPARTMENT'); ?></b></span></th>
+								</tr>
+								<tr>
+									<th><?php _e('Departments'); ?></th>
+									<th><?php _e('Form Request'); ?></th>
+
+								</tr>
+							</thead>
+							<tbody>
+								<?php foreach($departments as $department) {
+											$totaldep = counTicketsByDepartment($department['id'], $startdate, $enddate, $_GET['clientid'],$_GET[typeticket]);
+											
+											if($totaldep != "0"){
+									?>
+									<tr>
+										<td><?php echo $department['name']; ?></td>
+
+										<td><?php echo counTicketsByDepartment($department['id'], $startdate, $enddate, $_GET['clientid'],$_GET[typeticket]); ?></td>
+
+									</tr>
+								<?php }
+											} 
+								?>
+							</tbody>
+						</table>
+				  </div> -->
+
+		</div>
+
+		<!-- this row will not appear when printing -->
+		<div class="row no-print">
+          <div class="col-xs-12">
+            <button onClick="window.print();" class="btn btn-default pull-right"><i class="fa fa-print"></i> <?php _e('Print'); ?></button>
+          </div>
+        </div>
+
+	<?php } elseif($_GET['report'] == "timesheetSummary") { ?>
+
+
+        <div class="row"><div class="col-xs-12"><h2 class="page-header"><i class="fa fa-globe"></i> <?php echo getConfigValue("company_name"); ?><small class="pull-right"><?php _e('Date:'); ?> <?php echo dateDisplay(date('Y-m-d')); ?></small></h2></div></div>
+		<div class="row">
+			<div class="col-xs-6"><h4><b><?php _e('TIMESHEET WITH SUMMARRY'); ?></b></h4></div>
+			<div class="col-xs-6 text-right">
+				<?php if(isset($_GET['clientid']) && $_GET['clientid'] != 0) echo "<h4>".__("Client")." <b>".getSingleValue("clients","name",$_GET['clientid'])."</b></h4>"; ?>
+				<?php if(isset($_GET['startDate']) && isset($_GET['endDate'])) echo "<h4>".__("Date range")." <b>".$_GET['startDate']." - ".$_GET['endDate']."</b></h4>"; ?>
+			</div>
+		</div>
+		<br>
+		<div class="row">
+
+			<div class="col-xs-12 table-responsive">
+				<table class="table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th colspan="7"><span class="lead"><b><?php _e('TIME LOG'); ?></b></span></th>
+						</tr>
+						<tr>
+							<th><?php _e('Departments'); ?></th>
+							<th><?php _e('Asset'); ?></th>
+							<th><?php _e('Project'); ?></th>
+							<th><?php _e('Staff'); ?></th>
+							<th><?php _e('Date & Time'); ?></th>
+							<th><?php _e('Duration'); ?></th>
+							<th><?php _e('Tagged Items'); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php $totalsecs = 0; $totalissues = 0; $totaltickets = 0; ?>
+						<?php foreach($timelog as $item) { ?>
+							<?php
+							  $tag_issues = unserialize($item['issues']);
+							  $tag_tickets = unserialize($item['tickets']);
+
+							  if(empty($tag_issues)) $tag_issues = [];
+							  if(empty($tag_tickets)) $tag_tickets = [];
+							?>
+						<tr>
+
+							<td><?php echo getSingleValue("clients","name",$item['clientid']); ?></td>
+							<td><?php echo getSingleValue("assets","tag",$item['assetid']); ?><br><?php echo getSingleValue("assets","name",$item['assetid']); ?></td>
+							<td><?php echo getSingleValue("projects","tag",$item['projectid']); ?><br><?php echo getSingleValue("projects","name",$item['projectid']); ?></td>
+							<td><?php echo getSingleValue("people","name",$item['staffid']); ?></td>
+							<td><?php echo dateDisplay($item['date']); ?> <?php echo $item['start']; ?> <i class='fa fa-long-arrow-right'></i> <?php echo $item['end']; ?></td>
+							<td>
+								<?php
+									$currentduration = duration($item['date'], $item['start'], $item['end']);
+									$totalsecs = $totalsecs + $currentduration;
+								 ?>
+								<?php echo secondsToTime($currentduration); ?>
+							</td>
+
+							<td>
+								<?php foreach($tag_issues as $tag_issue) { $totalissues++; ?>
+								  <i class='fa fa-tasks fa-fw'></i> <?php echo getSingleValue("issues", "name", $tag_issue); ?><br>
+								<?php } ?>
+								<?php foreach($tag_tickets as $tag_ticket) { $totaltickets++; ?>
+								  <i class='fa fa-ticket fa-fw'></i> <?php echo getSingleValue("tickets", "ticket", $tag_ticket); ?> <?php echo getSingleValue("tickets", "subject", $tag_ticket); ?><br>
+								<?php } ?>
+							</td>
+
+							<td><?php echo $item['description']; ?></td>
+
+						</tr>
+						<?php } ?>
+					</tbody>
+					<tfoot>
+						<tr>
+							<th colspan="5"><?php _e('Totals'); ?></th>
+							<th><?php echo secondsToTime($totalsecs); ?> </th>
+							<th><?php echo $totalissues; ?> <?php _e('Issues'); ?>, <?php echo $totaltickets; ?> <?php _e('Tickets'); ?></th>
+						</tr>
+					</tfoot>
+				</table>
+		  </div>
+
+			<div class="col-xs-12 table-responsive">
+				<table class="table table-striped table-bordered">
+					<thead>
+						<tr>
+							<th colspan="8"><span class="lead"><b><?php _e('ISSUES'); ?></b></span></th>
+						</tr>
+						<tr>
+							<th><?php _e('ID'); ?></th>
+							<th><?php _e('Departments'); ?></th>
+							<th><?php _e('Asset'); ?></th>
+							<th><?php _e('Project'); ?></th>
+							<th><?php _e('Owner'); ?></th>
+							<th><?php _e('Name'); ?></th>
+							<th><?php _e('Status'); ?></th>
+							<th><?php _e('Date Added'); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach($issues as $task) { ?>
+						<tr>
+							<td><?php echo $task['id']; ?></td>
+							<td><?php echo getSingleValue("clients","name",$task['clientid']); ?></td>
+							<td><?php echo getSingleValue("assets","tag",$task['assetid']); ?><br><?php echo getSingleValue("assets","name",$task['assetid']); ?></td>
+							<td><?php echo getSingleValue("projects","tag",$task['projectid']); ?><br><?php echo getSingleValue("projects","name",$task['projectid']); ?></td>
+							<td><?php echo getSingleValue("people","name",$task['adminid']); ?></td>
+							<td><?php echo $task['name']; ?></td>
+							<td><?php echo $task['status']; ?></td>
+							<td><?php echo dateTimeDisplay($task['dateadded']); ?></td>
+						</tr>
+						<?php } ?>
+					</tbody>
+				</table>
+		  </div>
+		  <div class="col-xs-12 table-responsive">
+			  <table class="table table-striped table-bordered">
+				  <thead>
+					  <tr>
+						  <th colspan="8"><span class="lead"><b><?php _e('TICKETS'); ?></b></span></th>
+					  </tr>
+					  <tr>
+						  <th><?php _e('Ticket'); ?></th>
+						  <th><?php _e('Departments'); ?></th>
+						  <th><?php _e('Asset'); ?></th>
+						  <th><?php _e('Project'); ?></th>
+						  <th><?php _e('Owner'); ?></th>
+						  <th><?php _e('Subject'); ?></th>
+						  <th><?php _e('Status'); ?></th>
+						  <th><?php _e('Date Added'); ?></th>
+					  </tr>
+				  </thead>
+				  <tbody>
+					  <?php foreach($tickets as $ticket) { ?>
+					  <tr>
+						  <td>#<?php echo $ticket['ticket']; ?></td>
+
+						  <td><?php echo getSingleValue("clients","name",$ticket['clientid']); ?></td>
+						  <td><?php echo getSingleValue("assets","tag",$ticket['assetid']); ?><br><?php echo getSingleValue("assets","name",$ticket['assetid']); ?></td>
+						  <td><?php echo getSingleValue("projects","tag",$ticket['projectid']); ?><br><?php echo getSingleValue("projects","name",$ticket['projectid']); ?></td>
+						  <td><?php echo getSingleValue("people","name",$ticket['adminid']); ?></td>
+						  <td><?php echo $ticket['subject']; ?></td>
+						  <td><?php echo $ticket['status']; ?></td>
+						  <td><?php echo dateTimeDisplay($ticket['timestamp']); ?></td>
+					  </tr>
+					  <?php } ?>
+				  </tbody>
+			  </table>
+		</div>
+
+		</div>
+        <div class="row">
+          	<div class="col-xs-12 table-responsive">
+            	<table class="table table-striped table-bordered">
+              		<thead>
+						<tr>
+			                <th colspan="7"><span class="lead"><b><?php _e('ASSETS'); ?></b></span></th>
+		              	</tr>
+		              	<tr>
+							<th><?php _e('Departments'); ?></th>
+			                <th><?php _e('Tag'); ?></th>
+			                <th><?php _e('Name'); ?></th>
+			                <th><?php _e('Category'); ?></th>
+			                <th><?php _e('Model'); ?></th>
+			                <th><?php _e('Status'); ?></th>
+							<th><?php _e('Serial'); ?></th>
+		              	</tr>
+              		</thead>
+              		<tbody>
+						<?php foreach($assets as $asset) { $manufacturerid = getSingleValue("models","manufacturerid",$asset['modelid']); ?>
+              			<tr>
+							<td><?php echo getSingleValue("clients","name",$asset['clientid']); ?></td>
+			                <td><?php echo $asset['tag']; ?></td>
+			                <td><?php echo $asset['name']; ?></td>
+			                <td><?php echo getSingleValue("assetcategories","name",$asset['categoryid']); ?></td>
+			                <td><?php echo getSingleValue("manufacturers","name",$manufacturerid)." ".getSingleValue("models","name",$asset['modelid']); ?></td>
+							<td><?php echo getSingleValue("labels","name",$asset['statusid']); ?></td>
+			                <td><?php echo $asset['serial']; ?></td>
+              			</tr>
+						<?php } ?>
+              		</tbody>
+            	</table>
+          </div>
+        </div>
+		<div class="row">
+          	<div class="col-xs-12 table-responsive">
+            	<table class="table table-striped table-bordered">
+              		<thead>
+						<tr>
+			                <th colspan="5"><span class="lead"><b><?php _e('LICENSES'); ?></b></span></th>
+		              	</tr>
+		              	<tr>
+											<th><?php _e('Departments'); ?></th>
+			                <th><?php _e('Tag'); ?></th>
+											<th><?php _e('License Type'); ?></th>
+			                <th><?php _e('Name'); ?></th>
+			                <th><?php _e('Status'); ?></th>
+		              	</tr>
+              		</thead>
+              		<tbody>
+						<?php foreach($licenses as $license) { ?>
+              			<tr>
+							<td><?php echo getSingleValue("clients","name",$license['clientid']); ?></td>
+			                <td><?php echo $license['tag']; ?></td>
+							<td><?php echo getSingleValue("licensecategories","name",$license['categoryid']); ?></td>
+			                <td><?php echo $license['name']; ?></td>
+							<td><?php echo getSingleValue("labels","name",$license['statusid']); ?></td>
+              			</tr>
+						<?php } ?>
+              		</tbody>
+            	</table>
+          </div>
+        </div>
+
+		<!-- this row will not appear when printing -->
+		<div class="row no-print">
+          <div class="col-xs-12">
+            <button onClick="window.print();" class="btn btn-default pull-right"><i class="fa fa-print"></i> <?php _e('Print'); ?></button>
+          </div>
+        </div>
+
+	<?php } elseif($_GET['report'] == "summaryasset") { ?>
+
+    <div class="row"><div class="col-xs-12"><h2 class="page-header"><i class="fa fa-globe"></i> <?php echo getConfigValue("company_name"); ?><small class="pull-right"><?php _e('Date:'); ?> <?php echo dateDisplay(date('Y-m-d')); ?></small></h2></div></div>
+		<div class="row">
+			<div class="col-xs-6"><h4><b><?php _e('ASSETS SUMMARY'); ?></b></h4></div>
+			<div class="col-xs-6 text-right">
+				<?php if(isset($_GET['clientid']) && $_GET['clientid'] != 0) echo "<h4>".__("Client")." <b>".getSingleValue("clients","name",$_GET['clientid'])."</b></h4>"; ?>
+				<?php if(isset($_GET['startDate']) && isset($_GET['endDate'])) echo "<h4>".__("Date range")." <b>".$_GET['startDate']." - ".$_GET['endDate']."</b></h4>"; ?>
+			</div>
+		</div>
+		<br>
+				<div class="row">
+          	<div class="col-xs-12 table-responsive">
+          		<input style="height:26px; line-height: 0;" type="button" class="btn btn-info" value="Excel"  onclick="tableToExcel('tablesummaryassettotal')"></button>
+            	<table class="table table-striped table-bordered" id="tablesummaryassettotal">
+              		<thead>
+						<tr>
+			                <th colspan="7"><span class="lead"><b><?php _e('ASSETS SUMMARY'); ?></b></span></th>
+		              	</tr>
+		              	<tr>
+		              		<th>No</th>
+											<th><?php _e('Type'); ?></th>
+											<th><?php _e('Departments'); ?></th>
+			                <th><?php _e('Category'); ?></th>
+			                <th><?php _e('Status'); ?></th>
+											<th><?php _e('Total'); ?></th>
+		              	</tr>
+              		</thead>
+              		<tbody>
+						<?php $no=1;
+									
+									foreach($seltotal as $stl){
+						 ?>
+              			<tr>
+              				<td><?php echo $no;?></td>
+              				<td><?php if($stl['assettype'] == 1){echo "Owned";}else{echo "Rent";} ?></td>
+											<td><?php echo getSingleValue("clients","name",$stl['clientid']); ?></td>
+			                <td><?php echo getSingleValue("assetcategories","name",$stl['categoryid']); ?></td>
+											<td><?php echo getSingleValue("labels","name",$stl['statusid']); ?></td>
+			                <td><?php echo $stl['total']; ?></td>
+              			</tr>
+						<?php $no++; $totalall += $stl['total']; } ?>
+										<tr>
+              				<td colspan="5" align="center">Total</td>
+              				<td><?php echo $totalall; ?></td>
+              			</tr>
+              		</tbody>
+            	</table>
+          </div>
+        </div>
+      
+      <div align="center"><a href="javascript:void(0)" class="btn btn-warning" data-toggle='collapse' data-target='#demo'>Assets Detail</a></div>
+      <div id="demo" class="collapse" >
+        <div class="row">
+          	<div class="col-xs-12 table-responsive">
+          		<input style="height:26px; line-height: 0;" type="button" class="btn btn-info" value="Excel"  onclick="tableToExcel('tablesummaryasset')"></button>
+            	<table class="table table-striped table-bordered" id="tablesummaryasset">
+              		<thead>
+						<tr>
+			                <th colspan="7"><span class="lead"><b><?php _e('ASSETS DETAILS'); ?></b></span></th>
+		              	</tr>
+		              	<tr>
+		              		<th>No</th>
+											<th><?php _e('Type'); ?></th>
+											<th><?php _e('Departments'); ?></th>
+			                <th><?php _e('Tag'); ?></th>
+			                <th><?php _e('Name'); ?></th>
+			                <th><?php _e('Category'); ?></th>
+			                <th><?php _e('Machine ID'); ?></th>
+			                <th><?php _e('Model'); ?></th>
+			                <th><?php _e('Status'); ?></th>
+											<th><?php _e('Serial'); ?></th>
+											<th><?php _e('IP Addr'); ?></th>
+		              	</tr>
+              		</thead>
+              		<tbody>
+						<?php $no=1;
+						 foreach($assets as $asset) { $manufacturerid = getSingleValue("models","manufacturerid",$asset['modelid']); ?>
+              			<tr>
+              				<td><?php echo $no;?></td>
+              				<td><?php if($asset['assettype'] == 1){echo "Owned";}else{echo "Rent";} ?></td>
+											<td><?php echo getSingleValue("clients","name",$asset['clientid']); ?></td>
+			                <td><?php echo $asset['tag']; ?></td>
+			                <td><?php echo $asset['name']; ?></td>
+			                <td><?php echo getSingleValue("assetcategories","name",$asset['categoryid']); ?></td>
+			                <td><?php echo $asset['machine_id']; ?></td>
+			                <td><?php echo getSingleValue("manufacturers","name",$manufacturerid)." ".getSingleValue("models","name",$asset['modelid']); ?></td>
+							<td><?php echo getSingleValue("labels","name",$asset['statusid']); ?></td>
+			                <td><?php echo $asset['serial']; ?></td>
+			                <td><?php echo $asset['ipaddress']; ?></td>
+              			</tr>
+						<?php $no++; } ?>
+              		</tbody>
+            	</table>
+          </div>
+        </div>
+      </div>
+			<!-- <div class="row">
+          	<div class="col-xs-12 table-responsive">
+            	<table class="table table-striped table-bordered">
+              		<thead>
+						<tr>
+			                <th colspan="7"><span class="lead"><b><?php _e('LICENSES'); ?></b></span></th>
+		              	</tr>
+		              	<tr>
+							<th><?php _e('Departments'); ?></th>
+			                <th><?php _e('Tag'); ?></th>
+							<th><?php _e('Category'); ?></th>
+			                <th><?php _e('Name'); ?></th>
+			                <th><?php _e('Status'); ?></th>
+		              	</tr>
+              		</thead>
+              		<tbody>
+						<?php foreach($licenses as $license) { ?>
+              			<tr>
+							<td><?php echo getSingleValue("clients","name",$license['clientid']); ?></td>
+			                <td><?php echo $license['tag']; ?></td>
+							<td><?php echo getSingleValue("licensecategories","name",$license['categoryid']); ?></td>
+			                <td><?php echo $license['name']; ?></td>
+							<td><?php echo getSingleValue("labels","name",$license['statusid']); ?></td>
+              			</tr>
+						<?php } ?>
+              		</tbody>
+            	</table>
+          </div>
+        </div> -->
+
+        <!-- this row will not appear when printing -->
+        <div class="row no-print">
+          <div class="col-xs-12">
+            <button onClick="window.print();" class="btn btn-default pull-right"><i class="fa fa-print"></i> <?php _e('Print'); ?></button>
+          </div>
+        </div>
+
+    <?php } elseif($_GET['report'] == "summarylicense") { ?>
+    <div class="row"><div class="col-xs-12"><h2 class="page-header"><i class="fa fa-globe"></i> <?php echo getConfigValue("company_name"); ?><small class="pull-right"><?php _e('Date:'); ?> <?php echo dateDisplay(date('Y-m-d')); ?></small></h2></div></div>
+		<div class="row">
+			<div class="col-xs-6"><h4><b><?php _e('LICENSE SUMMARY'); ?></b></h4></div>
+			<div class="col-xs-6 text-right">
+				<?php if(isset($_GET['clientid']) && $_GET['clientid'] != 0) echo "<h4>".__("Client")." <b>".getSingleValue("clients","name",$_GET['clientid'])."</b></h4>"; ?>
+				<?php if(isset($_GET['startDate']) && isset($_GET['endDate'])) echo "<h4>".__("Date range")." <b>".$_GET['startDate']." - ".$_GET['endDate']."</b></h4>"; ?>
+			</div>
+		</div>
+		<br>
+
+        <div class="row">
+          	<div class="col-xs-12 table-responsive">
+          		<input style="height:26px; line-height: 0;" type="button" class="btn btn-info" value="Excel"  onclick="tableToExcel('tablesummarylicense')"></button>
+            	<table class="table table-striped table-bordered" id="tablesummarylicense">
+              		<thead>
+						<tr>
+			                <th colspan="7"><span class="lead"><b><?php _e('SUMMARY LICENSES'); ?></b></span></th>
+		              	</tr>
+		              	<tr>
+		              		<th>No</th>
+			                <th><?php _e('Tag'); ?></th>
+			                <th><?php _e('Name'); ?></th>
+			                <th><?php _e('Category'); ?></th>
+			                <th><?php _e('Seats'); ?></th>
+			                <th><?php _e('Balance'); ?></th>
+			                <th><?php _e('License Used'); ?></th>
+			                <th><?php _e('Installed'); ?></th>
+			                <th><?php _e('Downgraded'); ?></th>
+			                <th>No License</th>
+			                <th><?php _e('Status'); ?></th>
+		              	</tr>
+              		</thead>
+              		<tbody>
+						<?php $no=1;
+						 foreach($licenses as $license) { 
+						 				$used = $database->count("licenses_assets", [ "licenseid" => $license['id'] ] );
+						 				$insta = $database->count("licenses_assets", [ "inslicenseid" => $license['id'] ] ); 
+						 				
+						 				foreach($database->query("select count(id) jid from licenses_assets where inslicenseid = '$license[id]' and leaklicense = 0") as $ps){}
+										foreach($database->query("select count(id) jid from licenses_assets where licenseid = '$license[id]' and leaklicense = 0") as $pk){}
+										
+										foreach($database->query("select count(id) jid from licenses_assets where licenseid = '$license[id]' and leaklicense = 1") as $pz){}
+										
+						 ?>
+              			<tr>
+              				<td><?php echo $no;?></td>
+              				<td><?php echo $license['tag']; ?></td>
+			                <td><?php echo $license['name']; ?></td>
+			                <td><?php echo $license['namecat']." - ".$license['typecategory'];?></td>
+			                <td><?php echo $license['seats'] ?></td>
+											<td><?php $balance = $license[seats]-$used;
+																echo $balance; 
+													 ?>		 
+											</td>
+			                <td><?php echo $used ?></td>
+			                <td><?php echo $insta ?></td>
+			                <td><?php echo $downgrade = $pk['jid']-$ps['jid']; ?></td>
+			                <td><?php echo $nolicense = $pz['jid'] ?></td>
+											<td><?php echo getSingleValue("labels","name",$license['statusid']); ?></td>
+			              </tr>
+						<?php $no++; 
+									$totalused += $used;
+									$totalseats += $license['seats'];
+									$totalbal += $balance;
+									$totalinsta += $insta;
+									$totaldw += $downgrade;
+									$totalnl += $nolicense;
+								} ?>
+										<tr>
+											<td colspan="4" align="center">Total</td>
+											<td><?=$totalseats?></td>
+											<td><?=$totalbal?></td>
+											<td><?=$totalused?></td>
+											<td><?=$totalinsta?></td>
+											<td><?=$totaldw?></td>
+											<td><?=$totalnl?></td>											
+											<td>&nbsp;</td>
+										</tr>
+              		</tbody>
+            	</table>
+          </div>
+        </div>
+				
+				<div align="center"><a href="javascript:void(0)" class="btn btn-warning" data-toggle='collapse' data-target='#demo'>Licenses Detail</a></div>
+      <div id="demo" class="collapse" >
+        <div class="row">
+          	<div class="col-xs-12 table-responsive">
+          		<input style="height:26px; line-height: 0;" type="button" class="btn btn-info" value="Excel"  onclick="tableToExcel('tablesummarylicensedet')"></button>
+            	<table class="table table-striped table-bordered" id="tablesummarylicensedet">
+              		<thead>
+						<tr>
+			                <th colspan="7"><span class="lead"><b><?php _e('LICENSE DETAILS'); ?></b></span></th>
+		              	</tr>
+		              	<tr>
+		              		<th>No</th>
+											<th><?php _e('License'); ?></th>
+			                <th><?php _e('Tag'); ?></th>
+			                <th><?php _e('Name'); ?></th>
+			                <th><?php _e('Machine ID'); ?></th>
+			                <th><?php _e('License Used'); ?></th>
+			                <th><?php _e('Installed'); ?></th>
+			                <th><?php _e('Note'); ?></th>
+		              	</tr>
+              		</thead>
+              		<tbody>
+						<?php $no=1;
+						 			foreach($asetlicense as $asset) { ?>
+              			<tr>
+              				<td><?php echo $no;?></td>
+              				<td><?php echo $asset['licensename']; ?></td>
+			                <td><?php echo $asset['tag']; ?></td>
+			                <td><?php echo $asset['assetname']; ?></td>
+			                <td><?php echo $asset['machine_id']; ?></td>
+			                <td align="center"><?php echo $asset['licused']; ?></td>
+			                <td align="center"><?php echo $asset['installed']; ?></td>
+			                <td><?php if($asset['licused'] == '-' && $asset['installed'] == '-'){echo "No License";} else {echo $asset['notes'];} ?></td>
+              			</tr>
+						<?php $no++; } ?>
+              		</tbody>
+            	</table>
+          </div>
+        </div>
+      </div>
+
+        <!-- this row will not appear when printing -->
+        <div class="row no-print">
+          <div class="col-xs-12">
+            <button onClick="window.print();" class="btn btn-default pull-right"><i class="fa fa-print"></i> <?php _e('Print'); ?></button>
+          </div>
+        </div>
+
+    <?php } elseif($_GET['report'] == "summaryvirtual") { ?>
+    <div class="row"><div class="col-xs-12"><h2 class="page-header"><i class="fa fa-globe"></i> <?php echo getConfigValue("company_name"); ?><small class="pull-right"><?php _e('Date:'); ?> <?php echo dateDisplay(date('Y-m-d')); ?></small></h2></div></div>
+		<div class="row">
+			<div class="col-xs-6"><h4><b><?php _e('VIRTUAL MACHINE SUMMARY'); ?></b></h4></div>
+			<div class="col-xs-6 text-right">
+				<?php if(isset($_GET['clientid']) && $_GET['clientid'] != 0) echo "<h4>".__("Client")." <b>".getSingleValue("clients","name",$_GET['clientid'])."</b></h4>"; ?>
+				<?php if(isset($_GET['startDate']) && isset($_GET['endDate'])) echo "<h4>".__("Date range")." <b>".$_GET['startDate']." - ".$_GET['endDate']."</b></h4>"; ?>
+			</div>
+		</div>
+		<br>
+			<div class="row">
+          	<div class="col-xs-12 table-responsive">
+          		<input style="height:26px; line-height: 0;" type="button" class="btn btn-info" value="Excel"  onclick="tableToExcel('tablesummaryvirtual')"></button>
+            	<table class="table table-striped table-bordered" id="tablesummaryvirtual">
+              		<thead>
+						<tr>
+			                <th colspan="4"><span class="lead"><b><?php _e('SUMMARY VIRTUAL MACHINE'); ?></b></span></th>
+		              	</tr>
+		              	<tr>
+		              		<th>No</th>
+			                <th><?php _e('Hostname Fisik'); ?></th>
+			                <th><?php _e('Status'); ?></th>
+			                <th><?php _e('Total'); ?></th>
+		              	</tr>
+              		</thead>
+              		<tbody>
+						<?php $no=1;
+						 foreach($sumvirtuals as $svt) { 
+						 ?>
+              			<tr>
+              				<td><?php echo $no;?></td>
+              				<td><?php echo $svt['assetname']; ?></td>
+											<td><?php echo getSingleValue("labels","name",$svt['statusid']); ?></td>
+											<td><?php echo $svt['total']; ?></td>
+			              </tr>
+						<?php $no++; 
+									$totalused += $svt[total];
+									
+								} ?>
+										<tr>
+											<td colspan="3" align="center">Total</td>
+											<td><?=$totalused?></td>
+											</tr>
+              		</tbody>
+            	</table>
+          </div>
+        </div>
+
+			<div align="center"><a href="javascript:void(0)" class="btn btn-warning" data-toggle='collapse' data-target='#demo'>Virtual Machine Detail</a></div>
+      <div id="demo" class="collapse" >
+        <div class="row">
+          	<div class="col-xs-12 table-responsive">
+          		<input style="height:26px; line-height: 0;" type="button" class="btn btn-info" value="Excel"  onclick="tableToExcel('tablesummaryvirtualdet')"></button>
+            	<table class="table table-striped table-bordered" id="tablesummaryvirtualdet">
+              		<thead>
+						<tr>
+			                <th colspan="7"><span class="lead"><b><?php _e('VIRTUAL MACHINE DETAIL'); ?></b></span></th>
+		              	</tr>
+		              	<tr>
+		              		<th>No</th>
+			                <th><?php _e('Tag'); ?></th>
+			                <th><?php _e('Name'); ?></th>
+			                <th><?php _e('Computer Host'); ?></th>
+			                <th><?php _e('Ip Address'); ?></th>
+			                <th><?php _e('Status'); ?></th>
+			                <th><?php _e('Parent VM'); ?></th>
+		              	</tr>
+              		</thead>
+              		<tbody>
+						<?php $no=1;
+						 foreach($virtuals as $virtual) { ?>
+              			<tr>
+              				<td><?php echo $no;?></td>
+              				<td><?php echo $virtual['tag']; ?></td>
+			                <td><?php echo $virtual['name']; ?></td>
+			                <td><?php echo getSingleValue("assets","name",$virtual['assetid']); ?></td>
+			                <td><?php echo $virtual['ipaddress_vm'];?></td>
+											<td><?php echo getSingleValue("labels","name",$virtual['statusid']); ?></td>
+											<td><?php echo getSingleValue("virtuals","name",$virtual['parentid']); ?></td>
+			              </tr>
+						<?php $no++; } ?>
+              		</tbody>
+            	</table>
+          </div>
+        </div>
+			</div>
+
+        <!-- this row will not appear when printing -->
+        <div class="row no-print">
+          <div class="col-xs-12">
+            <button onClick="window.print();" class="btn btn-default pull-right"><i class="fa fa-print"></i> <?php _e('Print'); ?></button>
+          </div>
+        </div>
+		<?php } elseif($_GET['report'] == "userSummary") { ?>
+
+	        <div class="row"><div class="col-xs-12"><h2 class="page-header"><i class="fa fa-globe"></i> <?php echo getConfigValue("company_name"); ?><small class="pull-right"><?php _e('Date:'); ?> <?php echo dateDisplay(date('Y-m-d')); ?></small></h2></div></div>
+			<div class="row">
+				<div class="col-xs-6"><h4><b><?php _e('ASSETS SUMMARY'); ?></b></h4></div>
+				<div class="col-xs-6 text-right">
+					<?php if(isset($_GET['clientid']) && $_GET['clientid'] != 0) echo "<h4>".__("Client")." <b>".getSingleValue("clients","name",$_GET['clientid'])."</b></h4>"; ?>
+					<?php if(isset($_GET['startDate']) && isset($_GET['endDate'])) echo "<h4>".__("Date range")." <b>".$_GET['startDate']." - ".$_GET['endDate']."</b></h4>"; ?>
+				</div>
+			</div>
+			<br>
+	        <div class="row">
+	          	<div class="col-xs-12 table-responsive">
+	            	<table class="table table-striped table-bordered">
+	              		<thead>
+							<tr>
+				                <th colspan="7"><span class="lead"><b><?php _e('ASSETS'); ?></b></span></th>
+			              	</tr>
+			              	<tr>
+								<th><?php _e('Departments'); ?></th>
+								<th><?php _e('User'); ?></th>
+				                <th><?php _e('Tag'); ?></th>
+				                <th><?php _e('Name'); ?></th>
+				                <th><?php _e('Category'); ?></th>
+				                <th><?php _e('Model'); ?></th>
+				                <th><?php _e('Status'); ?></th>
+								<th><?php _e('Serial'); ?></th>
+			              	</tr>
+	              		</thead>
+	              		<tbody>
+							<?php foreach($assets as $asset) { $manufacturerid = getSingleValue("models","manufacturerid",$asset['modelid']); ?>
+	              			<tr>
+								<td><?php echo getSingleValue("clients","name",$asset['clientid']); ?></td>
+								<td><?php echo getSingleValue("people","name",$asset['userid']); ?></td>
+				                <td><?php echo $asset['tag']; ?></td>
+				                <td><?php echo $asset['name']; ?></td>
+				                <td><?php echo getSingleValue("assetcategories","name",$asset['categoryid']); ?></td>
+				                <td><?php echo getSingleValue("manufacturers","name",$manufacturerid)." ".getSingleValue("models","name",$asset['modelid']); ?></td>
+								<td><?php echo getSingleValue("labels","name",$asset['statusid']); ?></td>
+				                <td><?php echo $asset['serial']; ?></td>
+	              			</tr>
+							<?php } ?>
+	              		</tbody>
+	            	</table>
+	          </div>
+	        </div>
+
+
+	        <!-- this row will not appear when printing -->
+	        <div class="row no-print">
+	          <div class="col-xs-12">
+	            <button onClick="window.print();" class="btn btn-default pull-right"><i class="fa fa-print"></i> <?php _e('Print'); ?></button>
+	          </div>
+	        </div>
+	  <?php } elseif($_GET['report'] == "summarysparepartstock") { ?>
+
+    <div class="row"><div class="col-xs-12"><h2 class="page-header"><i class="fa fa-globe"></i> <?php echo getConfigValue("company_name"); ?><small class="pull-right"><?php _e('Date:'); ?> <?php echo dateDisplay(date('Y-m-d')); ?></small></h2></div></div>
+		<div class="row">
+			<div class="col-xs-6"><h4><b><?php _e('SUMMARY SPAREPARTS STOCK'); ?></b></h4></div>
+			<div class="col-xs-6 text-right">
+				<?php if(isset($_GET['clientid']) && $_GET['clientid'] != 0) echo "<h4>".__("Client")." <b>".getSingleValue("clients","name",$_GET['clientid'])."</b></h4>"; ?>
+				<?php if(isset($_GET['startDate']) && isset($_GET['endDate'])) echo "<h4>".__("Date range")." <b>".$_GET['startDate']." - ".$_GET['endDate']."</b></h4>"; ?>
+			</div>
+		</div>
+		<br>
+				<div class="row">
+          	<div class="col-xs-12 table-responsive">
+          		<input style="height:26px; line-height: 0;" type="button" class="btn btn-info" value="Excel"  onclick="tableToExcel('tablesummarysparepartstock')"></button>
+            	<table class="table table-striped table-bordered" id="tablesummarysparepartstock">
+              		<thead>
+										<tr>
+			                <th colspan="3"><span class="lead"><b><?php _e('SPAREPARTS STOCK'); ?></b></span></th>
+			                <th colspan="4"><b>Gudang : <?php if($_GET[gudangid] > 0){echo getSingleValue("gudang","name",$_GET['gudangid']);}else{echo "All";}?></b></span></th>
+			                <th colspan="2"><b>Jenis : <?php if($_GET[jenisbrg] == 1){echo "Baru";}else if($_GET[jenisbrg] == 2){echo "Bekas";}else{echo "All";}?></b></span></th>
+		              	</tr>
+		              	<tr>
+		              		<th>No</th>
+											<th><?php _e('Code'); ?></th>
+											<th><?php _e('Name'); ?></th>
+			                <th style="text-align: center"><?php _e('Min'); ?></th>
+			                <th style="text-align: center"><?php _e('Awal'); ?></th>
+			                <th style="text-align: center"><?php _e('Masuk'); ?></th>
+											<th style="text-align: center"><?php _e('Keluar'); ?></th>
+											<th style="text-align: center"><?php _e('Saldo Akhir'); ?></th>
+											<th>#</th>
+		              	</tr>
+              		</thead>
+              		<tbody>
+						<?php $no=1;
+									
+									foreach($seltotal as $stl){
+										$expl = explode("_",$stl[persediaan]);
+										foreach($database->query("select coalesce(sum(masukmutasi),0)as masuk,coalesce(sum(keluarmutasi),0)as keluar from tx_mutasi where id_gudang='$_GET[gudangid]' and sparepartid='$stl[id]' and jenisbrg = $_GET[jenisbrg] and $tglbet")as $dts){}
+										
+										$awal=$stl['sdawal'];
+                    $masuk=$dts['masuk'];
+                    $keluar=$dts['keluar'];
+                    $akhir=$awal+$dts['masuk']-$dts['keluar'];
+                    if($akhir <= $stl[min_stock]){$color="red";$extket="<span style='color:red'>Min. Stock</span>";}else{$color="black";$extket="";}
+						 ?>
+              			<tr>
+              				<td><?php echo $no;?></td>
+              				<td><?php echo $stl['tag']; ?></td>
+              				<td><?php echo $stl['name']; ?></td>
+											<td align="right"><?php echo $stl['min_stock']; ?></td>
+			                <td align="right"><?php echo $awal; ?></td>
+											<td align="right"><?php echo $masuk; ?></td>
+			                <td align="right"><?php echo $keluar; ?></td>
+			                <td align="right" style="color:<?=$color?>"><?php echo $akhir; ?></td>
+			                <td><a href="?route=inventory/spareparts/manage&id=<?=$stl[id]?>&section=kstock&startDate=<?=$_GET[startDate]?>&endDate=<?=$_GET[endDate]?>&gudangid=<?=$_GET[gudangid]?>&jenisbrg=<?=$_GET[jenisbrg]?>" target="_blank" class="no-print">mutasi</a><br>
+			                	<?php echo $extket; ?>
+			                </td>
+              			</tr>
+						<?php $no++; $ttlmasuk += $expl[0];
+									$ttlkeluar += $expl[1];
+									$ttlsdakhir += $stl[sdakhir];
+						 } ?>
+										<!-- <tr>
+              				<td colspan="5" align="center">Total</td>
+              				<td><?php echo $ttlmasuk; ?></td>
+              				<td><?php echo $ttlkeluar; ?></td>
+              				<td><?php echo $ttlsdakhir; ?></td>
+              			</tr> -->
+              		</tbody>
+            	</table>
+          </div>
+        </div>
+      
+      
+			<!-- <div class="row">
+          	<div class="col-xs-12 table-responsive">
+            	<table class="table table-striped table-bordered">
+              		<thead>
+						<tr>
+			                <th colspan="7"><span class="lead"><b><?php _e('LICENSES'); ?></b></span></th>
+		              	</tr>
+		              	<tr>
+							<th><?php _e('Departments'); ?></th>
+			                <th><?php _e('Tag'); ?></th>
+							<th><?php _e('Category'); ?></th>
+			                <th><?php _e('Name'); ?></th>
+			                <th><?php _e('Status'); ?></th>
+		              	</tr>
+              		</thead>
+              		<tbody>
+						<?php foreach($licenses as $license) { ?>
+              			<tr>
+							<td><?php echo getSingleValue("clients","name",$license['clientid']); ?></td>
+			                <td><?php echo $license['tag']; ?></td>
+							<td><?php echo getSingleValue("licensecategories","name",$license['categoryid']); ?></td>
+			                <td><?php echo $license['name']; ?></td>
+							<td><?php echo getSingleValue("labels","name",$license['statusid']); ?></td>
+              			</tr>
+						<?php } ?>
+              		</tbody>
+            	</table>
+          </div>
+        </div> -->
+        
+        <!-- this row will not appear when printing -->
+        <div class="row no-print">
+          <div class="col-xs-12">
+            <button onClick="window.print();" class="btn btn-default pull-right"><i class="fa fa-print"></i> <?php _e('Print'); ?></button>
+          </div>
+        </div>
+  <?php } elseif($_GET['report'] == "minimumstock") { ?>
+
+    <div class="row"><div class="col-xs-12"><h2 class="page-header"><i class="fa fa-globe"></i> <?php echo getConfigValue("company_name"); ?><small class="pull-right"><?php _e('Date:'); ?> <?php echo dateDisplay(date('Y-m-d')); ?></small></h2></div></div>
+		<div class="row">
+			<div class="col-xs-6"><h4><b><?php _e('MINIMUM SPAREPARTS STOCK'); ?></b></h4></div>
+			<div class="col-xs-6 text-right">
+				<?php if(isset($_GET['clientid']) && $_GET['clientid'] != 0) echo "<h4>".__("Client")." <b>".getSingleValue("clients","name",$_GET['clientid'])."</b></h4>"; ?>
+				<?php if(isset($_GET['startDate']) && isset($_GET['endDate'])) echo "<h4>".__("Date range")." <b>".$_GET['startDate']." - ".$_GET['endDate']."</b></h4>"; ?>
+			</div>
+		</div>
+		<br>
+				<div class="row">
+          	<div class="col-xs-12 table-responsive">
+          		<input style="height:26px; line-height: 0;" type="button" class="btn btn-info" value="Excel"  onclick="tableToExcel('tableminimumstock')"></button>
+            	<table class="table table-striped table-bordered" id="tableminimumstock">
+              		<thead>
+										<tr>
+			                <th colspan="3"><span class="lead"><b><?php _e('MINIMUM SPAREPARTS STOCK'); ?></b></span></th>
+			                <th colspan="4"><b>Gudang : <?php if($_GET[gudangid] > 0){echo getSingleValue("gudang","name",$_GET['gudangid']);}else{echo "All";}?></b></span></th>
+			                <th colspan="2"><b>Jenis : <?php if($_GET[jenisbrg] == 1){echo "Baru";}else if($_GET[jenisbrg] == 2){echo "Bekas";}else{echo "All";}?></b></span></th>
+		              	</tr>
+		              	<tr>
+		              		<th>No</th>
+											<th><?php _e('Code'); ?></th>
+											<th><?php _e('Name'); ?></th>
+			                <th><?php _e('Min'); ?></th>
+											<th><?php _e('Saldo Akhir'); ?></th>
+											<th>#</th>
+		              	</tr>
+              		</thead>
+              		<tbody>
+						<?php $no=1;
+									
+									foreach($seltotal as $stl){
+										$expl = explode("_",$stl[persediaan]);
+										foreach($database->query("select coalesce(sum(masukmutasi),0)as masuk,coalesce(sum(keluarmutasi),0)as keluar from tx_mutasi where id_gudang='$_GET[gudangid]' and sparepartid='$stl[id]' and jenisbrg = $_GET[jenisbrg] and $tglbet")as $dts){}
+										
+										$awal=$stl['sdawal'];
+                    $masuk=$dts['masuk'];
+                    $keluar=$dts['keluar'];
+                    $akhir=$awal+$dts['masuk']-$dts['keluar'];
+						 ?>
+              			<tr>
+              				<td><?php echo $no;?></td>
+              				<td><?php echo $stl['tag']; ?></td>
+              				<td><?php echo $stl['name']; ?></td>
+											<td><?php echo $stl['min_stock']; ?></td>
+			                <td><?php echo $akhir; ?></td>
+			                <td><a href="?route=inventory/spareparts/manage&id=<?=$stl[id]?>&section=kstock&startDate=<?=$_GET[startDate]?>&endDate=<?=$_GET[endDate]?>&gudangid=<?=$_GET[gudangid]?>&jenisbrg=<?=$_GET[jenisbrg]?>" target="_blank">mutasi</a></td>
+              			</tr>
+						<?php $no++; $ttlmasuk += $expl[0];
+									$ttlkeluar += $expl[1];
+									$ttlsdakhir += $stl[sdakhir];
+						 } ?>
+										
+              		</tbody>
+            	</table>
+          </div>
+        </div>
+      
+        <!-- this row will not appear when printing -->
+        <div class="row no-print">
+          <div class="col-xs-12">
+            <button onClick="window.print();" class="btn btn-default pull-right"><i class="fa fa-print"></i> <?php _e('Print'); ?></button>
+          </div>
+        </div>
+  <?php } elseif($_GET['report'] == "summarymaintenance") { ?>
+
+    <div class="row"><div class="col-xs-12"><h2 class="page-header"><i class="fa fa-globe"></i> <?php echo getConfigValue("company_name"); ?><small class="pull-right"><?php _e('Date:'); ?> <?php echo dateDisplay(date('Y-m-d')); ?></small></h2></div></div>
+		<div class="row">
+			<div class="col-xs-6"><h4><b><?php _e('SUMMARY MAINTENANCE'); ?></b></h4></div>
+			<div class="col-xs-6 text-right">
+				<?php if(isset($_GET['clientid']) && $_GET['clientid'] != 0) echo "<h4>".__("Client")." <b>".getSingleValue("clients","name",$_GET['clientid'])."</b></h4>"; ?>
+				<?php if(isset($_GET['startDate']) && isset($_GET['endDate'])) echo "<h4>".__("Date range")." <b>".$_GET['startDate']." - ".$_GET['endDate']."</b></h4>"; ?>
+			</div>
+		</div>
+		<br>
+				<div class="row">
+          	<div class="col-xs-12 table-responsive">
+          		<input style="height:26px; line-height: 0;" type="button" class="btn btn-info" value="Excel"  onclick="tableToExcel('tablesummarysparepartstock')"></button>
+            	<table class="table table-striped table-bordered" id="tablesummarysparepartstock">
+              		<thead>
+										<tr>
+			                <th colspan="7"><span class="lead"><b><?php _e('MAINTENANCE'); ?></b></span></th>
+		              	</tr>
+		              	<tr>
+		              		<th>No</th>
+											<th><?php _e('No MTC'); ?></th>
+											<th><?php _e('Asset Name'); ?></th>
+			                <th><?php _e('Machine ID'); ?></th>
+			                <th><?php _e('Node System'); ?></th>
+			                <th><?php _e('Realisasi'); ?></th>
+			                <th><?php _e('Input'); ?></th>
+			                <th><?php _e('PIC'); ?></th>
+											<th><?php _e('Noted'); ?></th>
+		              	</tr>
+              		</thead>
+              		<tbody>
+						<?php $no=1;
+									foreach($assets as $ast){
+						 ?>
+              			<tr>
+              				<td><?=$no?></td>
+              				<td><?=$ast['nomtc']?></td>
+              				<td><?=$ast['assetname']." - ".$asset['namepeople']?></td>
+											<td><?=$ast['machine_id']?></td>
+			                <td><?=$ast['nodenumber']?></td>
+			                <td><?=$ast['tgl_mtc']?></td>
+			                <td><?=$ast['tgl_input']?></td>
+											<td><?=$ast['nameuser']?></td>
+			                <td><?=$ast['notedmtc']?></td>
+              			</tr>
+						<?php $no++; 
+						 } ?>
+										<!-- <tr>
+              				<td colspan="5" align="center">Total</td>
+              				<td><?php echo $ttlmasuk; ?></td>
+              				<td><?php echo $ttlkeluar; ?></td>
+              				<td><?php echo $ttlsdakhir; ?></td>
+              			</tr> -->
+              		</tbody>
+            	</table>
+          </div>
+        </div>
+      
+      <!-- <div align="center"><a href="javascript:void(0)" class="btn btn-warning" data-toggle='collapse' data-target='#demo'>Assets Detail</a></div>
+      <div id="demo" class="collapse" >
+        <div class="row">
+          	<div class="col-xs-12 table-responsive">
+          		<input style="height:26px; line-height: 0;" type="button" class="btn btn-info" value="Excel"  onclick="tableToExcel('tablesummaryasset')"></button>
+            	<table class="table table-striped table-bordered" id="tablesummaryasset">
+              		<thead>
+						<tr>
+			                <th colspan="7"><span class="lead"><b><?php _e('ASSETS DETAILS'); ?></b></span></th>
+		              	</tr>
+		              	<tr>
+		              		<th>No</th>
+											<th><?php _e('Type'); ?></th>
+											<th><?php _e('Departments'); ?></th>
+			                <th><?php _e('Tag'); ?></th>
+			                <th><?php _e('Name'); ?></th>
+			                <th><?php _e('Category'); ?></th>
+			                <th><?php _e('Machine ID'); ?></th>
+			                <th><?php _e('Model'); ?></th>
+			                <th><?php _e('Status'); ?></th>
+											<th><?php _e('Serial'); ?></th>
+											<th><?php _e('IP Addr'); ?></th>
+		              	</tr>
+              		</thead>
+              		<tbody>
+						<?php $no=1;
+						 foreach($assets as $asset) { $manufacturerid = getSingleValue("models","manufacturerid",$asset['modelid']); ?>
+              			<tr>
+              				<td><?php echo $no;?></td>
+              				<td><?php if($asset['assettype'] == 1){echo "Owned";}else{echo "Rent";} ?></td>
+											<td><?php echo getSingleValue("clients","name",$asset['clientid']); ?></td>
+			                <td><?php echo $asset['tag']; ?></td>
+			                <td><?php echo $asset['name']; ?></td>
+			                <td><?php echo getSingleValue("assetcategories","name",$asset['categoryid']); ?></td>
+			                <td><?php echo $asset['machine_id']; ?></td>
+			                <td><?php echo getSingleValue("manufacturers","name",$manufacturerid)." ".getSingleValue("models","name",$asset['modelid']); ?></td>
+							<td><?php echo getSingleValue("labels","name",$asset['statusid']); ?></td>
+			                <td><?php echo $asset['serial']; ?></td>
+			                <td><?php echo $asset['ipaddress']; ?></td>
+              			</tr>
+						<?php $no++; } ?>
+              		</tbody>
+            	</table>
+          </div>
+        </div>
+      </div> -->
+
+			<!-- <div class="row">
+          	<div class="col-xs-12 table-responsive">
+            	<table class="table table-striped table-bordered">
+              		<thead>
+						<tr>
+			                <th colspan="7"><span class="lead"><b><?php _e('LICENSES'); ?></b></span></th>
+		              	</tr>
+		              	<tr>
+							<th><?php _e('Departments'); ?></th>
+			                <th><?php _e('Tag'); ?></th>
+							<th><?php _e('Category'); ?></th>
+			                <th><?php _e('Name'); ?></th>
+			                <th><?php _e('Status'); ?></th>
+		              	</tr>
+              		</thead>
+              		<tbody>
+						<?php foreach($licenses as $license) { ?>
+              			<tr>
+							<td><?php echo getSingleValue("clients","name",$license['clientid']); ?></td>
+			                <td><?php echo $license['tag']; ?></td>
+							<td><?php echo getSingleValue("licensecategories","name",$license['categoryid']); ?></td>
+			                <td><?php echo $license['name']; ?></td>
+							<td><?php echo getSingleValue("labels","name",$license['statusid']); ?></td>
+              			</tr>
+						<?php } ?>
+              		</tbody>
+            	</table>
+          </div>
+        </div> -->
+        
+        <!-- this row will not appear when printing -->
+        <div class="row no-print">
+          <div class="col-xs-12">
+            <button onClick="window.print();" class="btn btn-default pull-right"><i class="fa fa-print"></i> <?php _e('Print'); ?></button>
+          </div>
+        </div>
+		<?php } else if($_GET['report'] == "timesheetlog") { ?>
+
+		<div class="row"><div class="col-xs-12"><h2 class="page-header"><i class="fa fa-globe"></i> <?php echo getConfigValue("company_name"); ?><small class="pull-right"><?php _e('Date:'); ?> <?php echo dateDisplay(date('Y-m-d')); ?></small></h2></div></div>
+		<div class="row">
+			<div class="col-xs-6"><h4><b><?php _e('TIMESHEET'); ?></b></h4></div>
+			<div class="col-xs-6 text-right">
+				<?php if(isset($_GET['peopleid']) && $_GET['peopleid'] != 0) echo "<h4>".__("Staff : ")." <b>".getSingleValue("people","name",$_GET['peopleid'])."</b></h4>"; ?>
+				<?php if(isset($_GET['startDate']) && isset($_GET['endDate'])) echo "<h4>".__("Date range")." <b>".$_GET['startDate']." - ".$_GET['endDate']."</b></h4>"; ?>
+			</div>
+		</div>
+		<br>
+
+		<div class="row">
+
+			<div class="col-xs-12 table-responsive">
+				<input style="height:26px; line-height: 0;" type="button" class="btn btn-info" value="Excel"  onclick="tableToExcel('timelogstaff')"></button>
+				<table class="table table-striped table-bordered" id="timelogstaff">
+					<thead>
+						<tr>
+							<th colspan="7"><span class="lead"><b><?php _e('TIME LOG'); ?></b></span></th>
+						</tr>
+						<tr class="collapse">
+							<th colspan="7"><?php if(isset($_GET['peopleid']) && $_GET['peopleid'] != 0) echo __("Staff : ")."<b>".getSingleValue("people","name",$_GET['peopleid'])."</b>"; ?></th>
+						</tr>
+						<tr class="collapse">
+							<th colspan="7"><?php if(isset($_GET['startDate']) && isset($_GET['endDate'])) echo __("Date range")." <b>".$_GET['startDate']." - ".$_GET['endDate']."</b>"; ?></th>
+						</tr>
+						<tr>
+							<th><?php _e('Departments'); ?></th>
+							<th><?php _e('Project'); ?></th>
+							<th><?php _e('Staff'); ?></th>
+							<th><?php _e('Date & Time'); ?></th>
+							<th><?php _e('Duration'); ?></th>
+							<th><?php _e('Tagged Items'); ?></th>
+							<th><?php _e('Remark'); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php $totalsecs = 0; $totalissues = 0; $totaltickets = 0; ?>
+						<?php foreach($timelog as $item) { ?>
+							<?php
+							  $tag_issues = unserialize($item['issues']);
+							  $tag_tickets = unserialize($item['tickets']);
+
+							  if(empty($tag_issues)) $tag_issues = [];
+							  if(empty($tag_tickets)) $tag_tickets = [];
+							?>
+						<tr>
+
+							<td><?php echo getSingleValue("clients","name",$item['clientid']); ?></td>
+							<!-- <td><?php echo getSingleValue("assets","tag",$item['assetid']); ?><br><?php echo getSingleValue("assets","name",$item['assetid']); ?></td> -->
+							<td><?php echo getSingleValue("projects","tag",$item['projectid']); ?><br><?php echo getSingleValue("projects","name",$item['projectid']); ?></td>
+							<td><?php echo getSingleValue("people","name",$item['staffid']); ?></td>
+							<td><?php echo dateDisplay($item['date']); ?> <?php echo $item['start']; ?> <i class='fa fa-long-arrow-right'></i> <?php echo $item['end']; ?></td>
+							<td>
+								<?php
+									$currentduration = duration($item['date'], $item['start'], $item['end']);
+									$totalsecs = $totalsecs + $currentduration;
+								 ?>
+								<?php echo secondsToTime($currentduration); ?>
+							</td>
+
+							<td>
+								<?php foreach($tag_issues as $tag_issue) { $totalissues++; ?>
+								  <i class='fa fa-tasks fa-fw'></i> <?php echo getSingleValue("issues", "name", $tag_issue); ?><br>
+								<?php } ?>
+								<?php foreach($tag_tickets as $tag_ticket) { $totaltickets++; ?>
+								  <i class='fa fa-ticket fa-fw'></i> <?php echo getSingleValue("tickets", "ticket", $tag_ticket); ?> <?php echo getSingleValue("tickets", "subject", $tag_ticket); ?><br>
+								<?php } ?>
+							</td>
+
+							<td><?php echo $item['description']; ?></td>
+
+						</tr>
+						<?php } ?>
+					</tbody>
+					<tfoot>
+						<tr>
+							<th colspan="5"><?php _e('Totals'); ?></th>
+							<th><?php //echo secondsToTime($totalsecs); ?> </th>
+							<th><?php echo $totalissues; ?> <?php _e('Issues'); ?>, <?php echo $totaltickets; ?> <?php _e('Tickets'); ?></th>
+						</tr>
+					</tfoot>
+				</table>
+		  </div>
+
+			<div class="col-xs-12 table-responsive">
+				<input style="height:26px; line-height: 0;" type="button" class="btn btn-info" value="Excel"  onclick="tableToExcel('timelogstaffissue')"></button>
+				<table class="table table-striped table-bordered" id="timelogstaffissue">
+					<thead>
+						<tr>
+							<th colspan="8"><span class="lead"><b><?php _e('ISSUES'); ?></b></span></th>
+						</tr>
+						<tr class="collapse">
+							<th colspan="7"><?php if(isset($_GET['peopleid']) && $_GET['peopleid'] != 0) echo __("Staff : ")."<b>".getSingleValue("people","name",$_GET['peopleid'])."</b>"; ?></th>
+						</tr>
+						<tr class="collapse">
+							<th colspan="7"><?php if(isset($_GET['startDate']) && isset($_GET['endDate'])) echo __("Date range")." <b>".$_GET['startDate']." - ".$_GET['endDate']."</b>"; ?></th>
+						</tr>
+						<tr>
+							<th><?php _e('ID'); ?></th>
+							<th><?php _e('Departments'); ?></th>
+							<th><?php _e('Asset'); ?></th>
+							<th><?php _e('Project'); ?></th>
+							<th><?php _e('Owner'); ?></th>
+							<th><?php _e('Name'); ?></th>
+							<th><?php _e('Status'); ?></th>
+							<th><?php _e('Date Added'); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach($issues as $task) { ?>
+						<tr>
+							<td><?php echo $task['id']; ?></td>
+							<td><?php echo getSingleValue("clients","name",$task['clientid']); ?></td>
+							<td><?php echo getSingleValue("assets","tag",$task['assetid']); ?><br><?php echo getSingleValue("assets","name",$task['assetid']); ?></td>
+							<td><?php echo getSingleValue("projects","tag",$task['projectid']); ?><br><?php echo getSingleValue("projects","name",$task['projectid']); ?></td>
+							<td><?php echo getSingleValue("people","name",$task['adminid']); ?></td>
+							<td><?php echo $task['name']; ?></td>
+							<td><?php echo $task['status']; ?></td>
+							<td><?php echo dateTimeDisplay($task['dateadded']); ?></td>
+						</tr>
+						<?php } ?>
+					</tbody>
+				</table>
+		  </div>
+		  <div class="col-xs-12 table-responsive">
+		  	<input style="height:26px; line-height: 0;" type="button" class="btn btn-info" value="Excel"  onclick="tableToExcel('timelogstaffticket')"></button>
+			  <table class="table table-striped table-bordered" id="timelogstaffticket">
+				  <thead>
+					  <tr>
+						  <th colspan="8"><span class="lead"><b><?php _e('TICKETS'); ?></b></span></th>
+					  </tr>
+					  <tr class="collapse">
+							<th colspan="7"><?php if(isset($_GET['peopleid']) && $_GET['peopleid'] != 0) echo __("Staff : ")."<b>".getSingleValue("people","name",$_GET['peopleid'])."</b>"; ?></th>
+						</tr>
+						<tr class="collapse">
+							<th colspan="7"><?php if(isset($_GET['startDate']) && isset($_GET['endDate'])) echo __("Date range")." <b>".$_GET['startDate']." - ".$_GET['endDate']."</b>"; ?></th>
+						</tr>
+					  <tr>
+						  <th><?php _e('Ticket'); ?></th>
+						  <th><?php _e('Departments'); ?></th>
+						  <th><?php _e('Asset'); ?></th>
+						  <th><?php _e('Project'); ?></th>
+						  <th><?php _e('Owner'); ?></th>
+						  <th><?php _e('Subject'); ?></th>
+						  <th><?php _e('Status'); ?></th>
+						  <th><?php _e('Date Added'); ?></th>
+					  </tr>
+				  </thead>
+				  <tbody>
+					  <?php foreach($tickets as $ticket) { ?>
+					  <tr>
+						  <td>#<?php echo $ticket['ticket']; ?></td>
+
+						  <td><?php echo getSingleValue("clients","name",$ticket['clientid']); ?></td>
+						  <td><?php echo getSingleValue("assets","tag",$ticket['assetid']); ?><br><?php echo getSingleValue("assets","name",$ticket['assetid']); ?></td>
+						  <td><?php echo getSingleValue("projects","tag",$ticket['projectid']); ?><br><?php echo getSingleValue("projects","name",$ticket['projectid']); ?></td>
+						  <td><?php echo getSingleValue("people","name",$ticket['adminid']); ?></td>
+						  <td><?php echo $ticket['subject']; ?></td>
+						  <td><?php echo $ticket['status']; ?></td>
+						  <td><?php echo dateTimeDisplay($ticket['timestamp']); ?></td>
+					  </tr>
+					  <?php } ?>
+				  </tbody>
+			  </table>
+		</div>
+		</div>
+
+		<!-- this row will not appear when printing -->
+		<div class="row no-print">
+          <div class="col-xs-12">
+            <button onClick="window.print();" class="btn btn-default pull-right"><i class="fa fa-print"></i> <?php _e('Print'); ?></button>
+          </div>
+        </div>
+
+
+	<?php } ?>
+
+
+</section></section>
+<!-- /.content -->
+</aside><!-- /.right-side -->
+
+<script type="text/javascript">
+	var tableToExcel = (function() {
+		
+  var uri = 'data:application/vnd.ms-excel;base64,';
+  var template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>';
+    var bases = function(s) { return window.btoa(unescape(encodeURIComponent(s))) };
+    var format = function(s, c) { return s.replace(/{(\w+)}/g, function(m, p) { return c[p]; }) };
+  	return function(table, name) {
+    	if (!table.nodeType) table = document.getElementById(table)
+    	var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
+    	window.location.href = uri + bases(format(template, ctx))
+ 	}
+	
+  })()
+</script>

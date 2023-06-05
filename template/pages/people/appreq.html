@@ -1,0 +1,77 @@
+<aside class="right-side">
+	<!-- Content Header (Page header) -->
+	<section class="content-header">
+		<h1 class="pull-left"><?php _e('Approve Request User'); ?><small> <?php _e('Manage Approve Request'); ?></small></h1>
+		<!-- <div class="pull-right"><?php if(in_array("addAkunakses",$perms)) { ?><a onClick='showM("index.php?modal=akunakses/add&reroute=people/akunakses&routeid=&section=");return false' data-toggle="modal" class="btn btn-primary btn-sm btn-flat"><?php _e('NEW MASTER AKUN AKSES'); ?></a><?php } ?></div> -->
+		<div style="clear:both"></div>
+	</section>
+	<!-- Main content -->
+	<section class="content">
+		<?php if(!empty($statusmessage)): ?>
+				<div class="row"><div class='col-md-12'><div class="alert alert-<?php print $statusmessage["type"]; ?> alert-auto" role="alert"><?php print __($statusmessage["message"]); ?></div></div></div>
+		<?php endif; ?>
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="box box-primary">
+                    <div class="box-body">
+						<div class="table-responsive">
+	                        <table id="dataTablesFull" class="table table-striped table-hover table-bordered">
+	                            <thead>
+	                                <tr>
+	                                    <th><?php _e('ID'); ?></th>
+	                                    <th><?php _e('Type Req'); ?></th>
+	                                    <th><?php _e('No Peg'); ?></th>
+										<th><?php _e('Name'); ?></th>
+										<th><?php _e('Dept'); ?></th>
+										<th><?php _e('Status'); ?></th>
+										<th class="text-right"></th>
+	                                </tr>
+	                            </thead>
+	                            <tbody>
+									<?php
+									$requests = $database->query("select a.id as peopleids,a.name as namepeople, c.`name` as namedept, b.title,b.mobile,b.statusid,b.id as iddtl,case when typereq = 1 then 'Permintaan Akun' when typereq = 2 then 'Izin Akses Data' when typereq = 4 then 'Penutupan Akun' 
+	end as typereqshow,typereq,a.nogm,concat(b.id,'_',b.typereq) as gab,concat(b.id,'_',b.statusid,'_',b.typereq) as gat,DATE(b.created_date) created_date_dtl,e.headstatus,e.itstatus,d.name as namelocation,c.approve_type
+from people a join people_dtl_request b on a.id=b.peopleid and b.statusid != 'Reject'
+join clients c on b.clientid=c.id join locations d on b.locationid=d.id 
+join (select * from people_dtl_approve where id not in (select id from people_dtl_approve where itstatus != '')) e on b.id=e.peopledtlid where b.peopledtlidparent = 0 ORDER BY b.id ASC");
+									foreach ($requests as $req) {
+									
+									if($req[headstatus] == ''){$headstatus = "<font style='color:blue'>Request</font>";}else{
+										if($req['headstatus'] == 'Approve'){
+											$headstatus="<span class='label label-success btn-sm'>".$req['headstatus']."</span>";
+										} else if ($req['headstatus'] == 'Reject'){$headstatus="<span class='label label-danger btn-sm'>".$req['headstatus']."</span>";}}
+
+									if($req[itstatus] == ''){$itstatus = "<font style='color:blue'>Request</font>";}else{if($req['itstatus'] == 'Approve'){
+											$itstatus="<span class='label label-success btn-sm'>".$req['itstatus']."</span>";
+										} else if ($req['itstatus'] == 'Reject'){$itstatus="<span class='label label-danger btn-sm'>".$req['itstatus']."</span>";}}
+									if($req[typereq] == 1){$ctk = "newrequestacc";}else if($req[typereq] == 2){$ctk = "newrequestaci";}else if($req[typereq] == 4){$ctk = "newrequestacp";}
+	                                echo "<tr>";
+	                                    echo "<td>".$req['iddtl']."</td>";
+	                                    echo "<td>".$req['typereqshow']."</td>";
+										echo "<td>".$req['nogm']."</td>";
+										echo "<td>".$req['namepeople']."</td>";
+										echo "<td>".$req['namedept']." - ".$req['namelocation']."</td>";
+										echo "<td> Head App : ".$headstatus."<br>IT App : ".$itstatus."</td>";
+										echo "<td><div class='pull-right btn-group'>";
+													foreach($database->query("select count(*) jmlizin,peopledtlid from people_izinakses where peopledtlid = '$req[iddtl]' and id not in (select id from people_izinakses where headizinstatus != '')") as $ijin){}
+
+													if(($req[itstatus] == '' && $liu['approval_type'] == 2 && $req[headstatus] != '') || ($req[headstatus] == '' && $liu['approval_type'] == 2 && $req[approve_type] == '1')) {
+														if(($req['typereq'] == 2 && ($ijin[jmlizin] == 0 || $ijin[jmlizin] == '')) || $req['typereq'] != 2){
+														 echo "<a href='#' onClick='showM(\"index.php?modal=appreq/edit&reroute=people/appreq&routeid=&id=".$req['iddtl']."&section=\");return false' class='btn btn-flat btn-success btn-sm' title='Approve Process'><i class='fa fa-edit'></i></a>";
+														}
+													}
+													echo "<a href='?route=people/users/edit&id=$req[peopleids]&section=detailAkun&dtl=$req[iddtl]' class='btn btn-flat btn-primary btn-sm' target='_blank' title='List Process Request'><i class='fa fa-list'></i></a>";
+													echo "<a href='http://192.168.31.25/eraticket/cetak.php?page=$ctk&id=$req[iddtl]' class='btn btn-flat btn-warning btn-sm' title='View Form' target='_blank'><i class='fa fa-eye'></i></a>";
+										echo "</div></td>";
+	                                echo "</tr>";
+									}
+									?>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section><!-- /.content -->
+</aside><!-- /.right-side -->

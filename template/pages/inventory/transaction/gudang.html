@@ -1,0 +1,53 @@
+<!-- Right side column. Contains the navbar and content of the page -->
+<aside class="right-side">
+	<!-- Content Header (Page header) -->
+	<section class="content-header">
+		<h1 class="pull-left"><?php _e('Gudang'); ?>  <small> <?php _e('Manage Gudang'); ?></small></h1>
+		<div class="pull-right"><a onClick='showM("?modal=gudang/add&reroute=inventory/attributes/gudang");return false' data-toggle="modal" class="btn btn-primary btn-sm btn-flat"><?php _e('NEW GUDANG'); ?></a></div>
+		<div style="clear:both"></div>
+	</section>
+	<!-- Main content -->
+	<section class="content">
+		<?php if(!empty($statusmessage)): ?>
+				<div class="row"><div class='col-md-12'><div class="alert alert-<?php print $statusmessage["type"]; ?> alert-auto" role="alert"><?php print __($statusmessage["message"]); ?></div></div></div>
+		<?php endif; ?>
+		<div class="row">
+			<div class="col-xs-12">
+				<div class="box box-primary">
+                    <div class="box-body">
+						<div class="table-responsive">
+	                        <table id="dataTablesFull" class="table table-striped table-hover table-bordered">
+	                            <thead>
+	                                <tr>
+	                                    <th><?php _e('ID'); ?></th>
+	                                    <th><?php _e('Name'); ?></th>
+	                                    <th><?php _e('Status'); ?></th>
+										<th class="text-right"></th>
+	                                </tr>
+	                            </thead>
+	                            <tbody>
+									<?php
+									foreach ($gudangs as $gudang) {
+	                                echo "<tr>";
+	                                    echo "<td>".$gudang['id']."</td>";
+	                                    echo "<td>".$gudang['name']."</td>";
+	                                    echo "<td>".$gudang['status']."</td>";
+										echo "<td>
+												<div class='btn-group pull-right'>
+													<a href='#' onClick='showM(\"?modal=gudang/view&id=".$gudang['id']."\");return false' class='btn btn-flat btn-primary btn-sm'><i class='fa fa-eye'></i></a>
+													<a href='#' onClick='showM(\"?modal=gudang/edit&reroute=inventory/attributes/gudang&id=".$gudang['id']."\");return false' class='btn btn-flat btn-success btn-sm'><i class='fa fa-edit'></i></a>
+													<!-- <a href='#' onClick='showM(\"?modal=gudang/delete&reroute=inventory/attributes/gudang&id=".$gudang['id']."\");return false' class='btn btn-flat btn-danger btn-sm'><i class='fa fa-trash-o'></i></a> -->
+												</div>
+											  </td>";
+	                                echo "</tr>";
+									}
+									?>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section><!-- /.content -->
+</aside><!-- /.right-side -->
